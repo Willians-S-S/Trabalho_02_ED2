@@ -11,7 +11,7 @@ typedef struct Info Info;
 
 // Infor vai conter a palavra e a lista de números das linha
 struct Info{
-    char palavra[100];
+    char *palavra;
     Linhas *ListaNum;
 };
 
@@ -25,7 +25,7 @@ struct Rubro{
 };
 
 
-void lerArquivo();
+void lerArquivo(char *nomeArquivo, Rubro **raiz, int inseriu[]);
 
 void buscar(Rubro *raiz, char palavra[], int *achou);
 
@@ -33,7 +33,7 @@ int cor(Rubro *raiz);
 
 void inserirLinha(Linhas **no, int linha, int inseriu[]);
 
-Rubro *criaNo(char palavra[], int linha, int inseriu[]);
+Rubro *criaNo(char *palavra, int linha, int inseriu[]);
 
 void inserirPalavra(Rubro **raiz, char *palavra, int linha, int *inseriu);
 

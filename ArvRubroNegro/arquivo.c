@@ -26,9 +26,9 @@
 // }
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
 
 int main() {
     FILE *arquivo = fopen("arquivo.txt", "r"); // Abrir o arquivo em modo leitura
@@ -49,9 +49,9 @@ int main() {
     int contador = 1;
 
      while (fgets(linha, sizeof(linha), arquivo) != NULL) {
-        printf("%s\n", linha);
+        
         palavra = strtok(linha, " ");
-        printf("%s\n", linha);
+        
         while (palavra != NULL && (strcmp(palavra, palavraDesejada) != 0)) {
             palavra = strtok(NULL, " "); // Ler a próxima palavra
             if(palavra != NULL)
@@ -69,5 +69,45 @@ int main() {
 
     fclose(arquivo); // Fechar o arquivo
 
+    return 0;
+}
+
+#include <stdio.h>
+#include <string.h>
+
+void substituirPalavra(char *str, const char *palavraAntiga, const char *palavraNova) {
+    char *posicao;
+    int tamanhoPalavraAntiga = strlen(palavraAntiga);
+    int tamanhoPalavraNova = strlen(palavraNova);
+    int tamanhoDiferenca = tamanhoPalavraNova - tamanhoPalavraAntiga;
+    
+    while ((posicao = strstr(str, palavraAntiga)) != NULL) {
+        // Copiar a parte da string após a palavra antiga para um buffer temporário
+        printf("Posicao: %s \n\n", posicao);
+        char buffer[1000];
+        strcpy(buffer, posicao + tamanhoPalavraAntiga);
+        
+        // Substituir a palavra antiga pela nova
+        strcpy(posicao, palavraNova);
+        
+        // Concatenar a parte restante da string após a nova palavra
+        strcat(posicao, buffer);
+        
+        // Avançar na string para a próxima ocorrência da palavra antiga
+        str = posicao + tamanhoPalavraNova;
+    }
+}
+
+int main() {
+    char str[1000] = "O rato roeu a roupa do rei de Roma roeu.";
+    const char palavraAntiga[] = "roeu";
+    const char palavraNova[] = "comeu";
+    
+    printf("String original: %s\n", str);
+    
+    substituirPalavra(str, palavraAntiga, palavraNova);
+    
+    printf("String modificada: %s\n", str);
+    
     return 0;
 }

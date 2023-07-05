@@ -30,11 +30,14 @@ void inserirLinha(Linhas **no, int linha, int inseriu[]){
         inserirLinha(&((*no)->prox), linha, inseriu);
 }
 
-Rubro *criaNo(char palavra[], int linha, int inseriu[]){
+Rubro *criaNo(char *palavra, int linha, int inseriu[]){
     Rubro *novo;
     novo = (Rubro*) malloc(sizeof(Rubro));
     if(novo != NULL){
         novo->info = (Info*) malloc(sizeof(Info));
+
+        novo->info->palavra = (char*) malloc((strlen(palavra) + 1) * sizeof(char)); // Aloca memória para a palavra
+
 
         strcpy(novo->info->palavra, palavra);
         inserirLinha(&(novo->info->ListaNum), linha, inseriu);
@@ -134,4 +137,28 @@ void rotacaoDir(Rubro **raiz){
 
     (*raiz)->cor = (*raiz)->dir->cor;
     (*raiz)->dir->cor = RED;
+}
+
+void lerArquivo(char *path, Rubro **raiz, int inseriu[]){
+    FILE *arquivo;
+    arquivo = fopen(path, "r");
+
+    if(arquivo == NULL){
+        printf("Erro ao abrir o arquivo.");
+    }
+
+    char frase[100], *palavra;
+
+    int linha = 1;
+
+    while(fgets(frase, sizeof(frase), arquivo) != NULL){
+        palavra = strtok(frase, " ");
+
+        while (palavra != NULL){
+            inserirRubro(raiz, palavra, linha, inseriu);
+            palavra = strtok(NULL, " ");
+        }
+        linha += 1;
+    }
+
 }
