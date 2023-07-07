@@ -29,6 +29,10 @@ void lerArquivo(char *nomeArquivo, Rubro **raiz, int inseriu[]);
 
 void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]);
 
+void buscaLinha(Linhas *no, int linha, int achou[]);
+
+void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]);
+
 void auxRemover(Rubro **raiz, char *palavra, int linha, int achou[]);
 
 int cor(Rubro *raiz);
@@ -39,7 +43,7 @@ Rubro *criaNo(char *palavra, int linha, int inseriu[]);
 
 void inserirPalavra(Rubro **raiz, char *palavra, int linha, int *inseriu);
 
-void excluirPalavra();
+// void excluirPalavra();
 
 void imprimirLinhas(Linhas *no);
 

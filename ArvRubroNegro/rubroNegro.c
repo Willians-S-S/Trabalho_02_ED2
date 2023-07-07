@@ -190,12 +190,62 @@ void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]){
     }
 }
 
+
+void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
+    int igualMenorMaior;
+    igualMenorMaior = strcmp(palavra, (*raiz)->info->palavra);
+    if(igualMenorMaior < 0){
+        
+        if(cor((*raiz)->esq) == BLACK && (*raiz)->esq->esq == BLACK)
+            mover2EsqRed(raiz);
+
+        removePalavra((*raiz)->esq, palavra, linha, achou);
+
+    }else{
+        if(cor((*raiz)->esq) == RED)
+            rotacaoDir(raiz);
+        
+        if(igualMenorMaior == 0 && ((*raiz)->dir == NULL)){
+            removeLinha(&((*raiz)->info->ListaNum), linha, achou);
+            
+            if((*raiz)->info->ListaNum == NULL){
+                free(raiz);
+                achou[3] = 1;
+            }
+        }
+
+        if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK)
+            mover2DirRed(raiz);
+
+        if(igualMenorMaior == 0){
+            removeLinha(&((*raiz)->info->ListaNum), linha, achou);
+            
+            if((*raiz)->info->ListaNum == NULL){
+                Rubro *aux;
+                aux = procuraMenor((*raiz)->dir);
+                strcpy((*raiz)->info->palavra, aux->info->palavra);
+                (*raiz)->info->ListaNum = aux->info->ListaNum;
+                removeMenor(&((*raiz)->dir));
+                achou[3] = 1;
+            }
+        
+        }else
+            removePalavra((*raiz)->dir, palavra, linha, achou);
+    }
+    balancear(raiz);
+}
+
+// achou[0] posição para informar que encontrou a palavra
+// achou[1] posição para informar que encontrou a linha
+// achou[2] posição para informar que removeu uma linha
+// achou[3] posição para informar que removeu a palavra 
+
 void auxRemover(Rubro **raiz, char *palavra, int linha, int achou[]){
     if(*raiz){
         buscarPalavra(*raiz, palavra, linha, achou);
         // achou indica que achou a palavra e a linha
         if(achou[0] == 1 && achou[1] == 1){
-            
+            removePalavra(raiz, palavra, linha, achou);   
         }
     }
 }
