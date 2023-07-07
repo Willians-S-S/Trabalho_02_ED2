@@ -27,7 +27,9 @@ struct Rubro{
 
 void lerArquivo(char *nomeArquivo, Rubro **raiz, int inseriu[]);
 
-void buscar(Rubro *raiz, char palavra[], int *achou);
+void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]);
+
+void auxRemover(Rubro **raiz, char *palavra, int linha, int achou[]);
 
 int cor(Rubro *raiz);
 

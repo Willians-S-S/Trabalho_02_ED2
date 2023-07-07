@@ -162,3 +162,40 @@ void lerArquivo(char *path, Rubro **raiz, int inseriu[]){
     }
 
 }
+
+// achou tem que vim de fora com as duas posições zeradas
+
+void buscaLinha(Linhas *no, int linha, int achou[]){
+    if(no){
+        if(no->linha == linha)
+            achou[1] = 1;
+        else
+            buscaLinha(no->prox, linha, achou);
+    }
+}
+
+void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]){
+    if(raiz){
+        int igualMenorMaior;
+     
+        igualMenorMaior = strcmp(palavra, raiz->info->palavra);
+
+        if(igualMenorMaior == 0){
+            achou[0] = 1;
+            buscaLinha(raiz->info->ListaNum, linha, achou);
+        }else if(igualMenorMaior < 0)
+            buscarPalavra(raiz->esq, palavra, linha, achou);
+        else
+            buscarPalavra(raiz->esq, palavra, linha, achou);
+    }
+}
+
+void auxRemover(Rubro **raiz, char *palavra, int linha, int achou[]){
+    if(*raiz){
+        buscarPalavra(*raiz, palavra, linha, achou);
+        // achou indica que achou a palavra e a linha
+        if(achou[0] == 1 && achou[1] == 1){
+            
+        }
+    }
+}
