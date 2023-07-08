@@ -211,6 +211,20 @@ void removeLinha(Linhas **no, int linha, int achou[]){
     }
 }
 
+void removeMenor(Rubro **raiz){
+    if((*raiz)->esq == NULL){
+        free(*raiz);
+        *raiz = NULL;
+    }
+    if(cor((*raiz)->esq) == BLACK && cor((*raiz)->esq->esq) == BLACK)
+        mover2EsqRed(raiz);
+
+    removeMenor(&((*raiz)->esq));
+    balancear(raiz);
+} 
+
+
+
 void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
     int igualMenorMaior;
     igualMenorMaior = strcmp(palavra, (*raiz)->info->palavra);
