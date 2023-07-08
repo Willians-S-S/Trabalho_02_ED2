@@ -243,6 +243,13 @@ void mover2EsqRed(Rubro **raiz){
     }
 }
 
+void mover2DirRed(Rubro **raiz){
+    trocaCor(*raiz);
+    if(cor((*raiz)->esq->esq) == RED){
+        rotacaoDir(&((*raiz)->dir));
+        trocaCor(*raiz);
+    }
+}
 
 
 void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
