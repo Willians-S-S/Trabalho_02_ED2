@@ -234,6 +234,15 @@ void removeMenor(Rubro **raiz){
     balancear(raiz);
 } 
 
+void mover2EsqRed(Rubro **raiz){
+    trocaCor(*raiz);
+    if(cor((*raiz)->dir->esq) == RED){
+        rotacaoDir(&((*raiz)->dir));
+        rotacaoEsq(raiz);
+        trocaCor(*raiz);
+    }
+}
+
 
 
 void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
