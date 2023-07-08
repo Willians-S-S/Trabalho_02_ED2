@@ -251,6 +251,16 @@ void mover2DirRed(Rubro **raiz){
     }
 }
 
+void balancear(Rubro **raiz){
+    if(cor((*raiz)->dir) == RED)
+        rotacaoEsq(raiz);
+    
+    if((*raiz)->esq != NULL && cor((*raiz)->dir) == RED && cor((*raiz)->esq->esq) == RED)
+        rotacaoDir(raiz);
+
+    if(cor((*raiz)->esq) == RED && cor((*raiz)->dir) == RED)
+        trocaCor(*raiz);
+}
 
 void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
     int igualMenorMaior;

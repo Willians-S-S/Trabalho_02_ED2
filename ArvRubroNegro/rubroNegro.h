@@ -31,6 +31,12 @@ void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]);
 
 void buscaLinha(Linhas *no, int linha, int achou[]);
 
+void balancear(Rubro **raiz);
+
+void mover2EsqRed(Rubro **raiz);
+
+void mover2DirRed(Rubro **raiz);
+
 void removeMenor(Rubro **raiz);
 
 void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]);
