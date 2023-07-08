@@ -270,7 +270,7 @@ void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
         if(cor((*raiz)->esq) == BLACK && (*raiz)->esq->esq == BLACK)
             mover2EsqRed(raiz);
 
-        removePalavra((*raiz)->esq, palavra, linha, achou);
+        removePalavra(&((*raiz)->esq), palavra, linha, achou);
 
     }else{
         if(cor((*raiz)->esq) == RED)
@@ -301,7 +301,7 @@ void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
             }
         
         }else
-            removePalavra((*raiz)->dir, palavra, linha, achou);
+            removePalavra(&((*raiz)->dir), palavra, linha, achou);
     }
     balancear(raiz);
 }
