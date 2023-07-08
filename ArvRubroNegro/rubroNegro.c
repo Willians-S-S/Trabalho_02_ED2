@@ -8,6 +8,7 @@
 
 int cor(Rubro *raiz){
     int c;
+
     if(raiz == NULL)
         c = BLACK;
     else
@@ -109,7 +110,7 @@ void trocaCor(Rubro *raiz){
         raiz->cor = !raiz->cor;
         if(raiz->dir)
             raiz->dir->cor = !raiz->dir->cor;
-        else if(raiz->esq)
+        if(raiz->esq)
             raiz->esq->cor = !raiz->esq->cor; 
     }
 }
@@ -190,6 +191,25 @@ void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]){
     }
 }
 
+void removeLinha(Linhas **no, int linha, int achou[]){
+    if(*no){
+        if((*no)->linha == linha){
+            if((*no)->prox == NULL){// remove o ultimo nó
+                free(*no);
+                *no = NULL;
+                achou[2] = 1;
+            }else{ // remove o nó que estar no meio
+                Linhas *aux;
+                aux = *no;
+                *no = (*no)->prox;
+                free(aux);
+                achou[2] = 1;
+            }
+        }
+        else
+            removeLinha(&((*no)->prox), linha, achou);
+    }
+}
 
 void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
     int igualMenorMaior;
