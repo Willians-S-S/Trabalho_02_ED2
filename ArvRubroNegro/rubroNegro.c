@@ -55,19 +55,25 @@ Rubro *criaNo(char *palavra, int linha, int inseriu[]){
 }
 
 void inserirPalavra(Rubro **raiz, char *palavra, int linha, int inseriu[]){
+    int igualMenorMaior;
+    
+    if(*raiz != NULL)
+        igualMenorMaior = strcmp(palavra, (*raiz)->info->palavra);
+    
+
     if((*raiz) == NULL){
         *raiz = criaNo(palavra, linha, inseriu);
     }
     // verificar se o valor está na arvore, se estiver colocar o numero da linha na lista de numeros.
-    else if(strcmp((*raiz)->info->palavra, palavra) == 0){
+    else if(igualMenorMaior == 0){
         inseriu[0] = 2;
         inserirLinha(&((*raiz)->info->ListaNum), linha, inseriu);
 
-    }else if(strcmp((*raiz)->info->palavra, palavra) > 0)
-        inserirPalavra(&((*raiz)->dir), palavra, linha, inseriu); 
+    }else if(igualMenorMaior < 0)
+        inserirPalavra(&((*raiz)->esq), palavra, linha, inseriu); 
 
     else
-        inserirPalavra(&((*raiz)->esq), palavra, linha, inseriu);
+        inserirPalavra(&((*raiz)->dir), palavra, linha, inseriu);
 
     if(cor((*raiz)->dir) == RED && cor((*raiz)->esq) == BLACK)
         rotacaoEsq(raiz);
@@ -95,11 +101,15 @@ void imprimirLinhas(Linhas *no){
 
 }
 
+void imprimeNo(Rubro *no){
+    printf("Palavra: %s, cor: %d, linhas: ", no->info->palavra, cor(no));
+    imprimirLinhas(no->info->ListaNum);
+    printf("\n");
+}
+
 void imprimirAvr(Rubro *raiz){
     if(raiz){
-        printf("Palavra: %s e linhas: ", raiz->info->palavra);
-        imprimirLinhas(raiz->info->ListaNum);
-        printf("\n");
+        imprimeNo(raiz);
         imprimirAvr(raiz->esq);
         imprimirAvr(raiz->dir);
     }
@@ -175,7 +185,9 @@ void buscaLinha(Linhas *no, int linha, int achou[]){
     }
 }
 
-void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]){
+Rubro *buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]){
+    Rubro *aux;
+    aux = NULL;
     if(raiz){
         int igualMenorMaior;
      
@@ -183,12 +195,14 @@ void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]){
 
         if(igualMenorMaior == 0){
             achou[0] = 1;
+            aux = raiz;
             buscaLinha(raiz->info->ListaNum, linha, achou);
         }else if(igualMenorMaior < 0)
             buscarPalavra(raiz->esq, palavra, linha, achou);
         else
             buscarPalavra(raiz->esq, palavra, linha, achou);
     }
+    return aux;
 }
 
 void removeLinha(Linhas **no, int linha, int achou[]){
@@ -252,14 +266,16 @@ void mover2DirRed(Rubro **raiz){
 }
 
 void balancear(Rubro **raiz){
-    if(cor((*raiz)->dir) == RED)
-        rotacaoEsq(raiz);
-    
-    if((*raiz)->esq != NULL && cor((*raiz)->dir) == RED && cor((*raiz)->esq->esq) == RED)
-        rotacaoDir(raiz);
+    if(*raiz != NULL){
+        if(cor((*raiz)->dir) == RED)
+            rotacaoEsq(raiz);
+        
+        if((*raiz)->esq != NULL && cor((*raiz)->dir) == RED && cor((*raiz)->esq->esq) == RED)
+            rotacaoDir(raiz);
 
-    if(cor((*raiz)->esq) == RED && cor((*raiz)->dir) == RED)
-        trocaCor(*raiz);
+        if(cor((*raiz)->esq) == RED && cor((*raiz)->dir) == RED)
+            trocaCor(*raiz);
+    }
 }
 
 void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
@@ -280,28 +296,31 @@ void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
             removeLinha(&((*raiz)->info->ListaNum), linha, achou);
             
             if((*raiz)->info->ListaNum == NULL){
-                free(raiz);
+                free(*raiz);
+                *raiz = NULL;
                 achou[3] = 1;
             }
         }
 
-        if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK)
-            mover2DirRed(raiz);
+        if(*raiz != NULL){
+            if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK)
+                mover2DirRed(raiz);
 
-        if(igualMenorMaior == 0){
-            removeLinha(&((*raiz)->info->ListaNum), linha, achou);
+            if(igualMenorMaior == 0){
+                removeLinha(&((*raiz)->info->ListaNum), linha, achou);
+                
+                if((*raiz)->info->ListaNum == NULL){
+                    Rubro *aux;
+                    aux = procuraMenor((*raiz)->dir);
+                    strcpy((*raiz)->info->palavra, aux->info->palavra);
+                    (*raiz)->info->ListaNum = aux->info->ListaNum;
+                    removeMenor(&((*raiz)->dir));
+                    achou[3] = 1;
+                }
             
-            if((*raiz)->info->ListaNum == NULL){
-                Rubro *aux;
-                aux = procuraMenor((*raiz)->dir);
-                strcpy((*raiz)->info->palavra, aux->info->palavra);
-                (*raiz)->info->ListaNum = aux->info->ListaNum;
-                removeMenor(&((*raiz)->dir));
-                achou[3] = 1;
-            }
-        
-        }else
-            removePalavra(&((*raiz)->dir), palavra, linha, achou);
+            }else
+                removePalavra(&((*raiz)->dir), palavra, linha, achou);
+        }
     }
     balancear(raiz);
 }

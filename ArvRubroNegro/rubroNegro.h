@@ -27,7 +27,7 @@ struct Rubro{
 
 void lerArquivo(char *nomeArquivo, Rubro **raiz, int inseriu[]);
 
-void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]);
+Rubro *buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]);
 
 void buscaLinha(Linhas *no, int linha, int achou[]);
 
@@ -56,6 +56,8 @@ void inserirPalavra(Rubro **raiz, char *palavra, int linha, int *inseriu);
 // void excluirPalavra();
 
 void imprimirLinhas(Linhas *no);
+
+void imprimeNo(Rubro *no);
 
 void imprimirAvr(Rubro *raiz);
 
