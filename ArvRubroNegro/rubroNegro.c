@@ -211,6 +211,17 @@ void removeLinha(Linhas **no, int linha, int achou[]){
     }
 }
 
+Rubro *procuraMenor(Rubro *raiz){
+    Rubro *aux;
+    if(raiz){
+        if(raiz->esq != NULL)
+            aux = procuraMenor(raiz->esq);
+        else
+            aux = raiz;
+    }
+    return aux;
+}
+
 void removeMenor(Rubro **raiz){
     if((*raiz)->esq == NULL){
         free(*raiz);

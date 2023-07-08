@@ -31,6 +31,8 @@ void buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]);
 
 void buscaLinha(Linhas *no, int linha, int achou[]);
 
+void removeMenor(Rubro **raiz);
+
 void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]);
 
 void removeLinha(Linhas **no, int linha, int achou[]);
