@@ -302,16 +302,21 @@ void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
                 achou[3] = 1;
             }
         }
-
-        // if(*raiz != NULL && (*raiz)->info->ListaNum == NULL){
-        if(*raiz != NULL && (*raiz)->info->ListaNum == NULL){
-            if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK){ // precisei mudar essa parte pq tava dando erro de segmentação
-                mover2DirRed(raiz);
-            }
             // if(cor((*raiz)->dir) == BLACK && (*raiz)->dir != NULL){ // precisei mudar essa parte pq tava dando erro de segmentação
             //     if(cor((*raiz)->dir->esq) == BLACK)
             //         mover2DirRed(raiz);
             // }
+
+        // if(*raiz != NULL && (*raiz)->info->ListaNum == NULL){
+        //     if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK) // precisei mudar essa parte pq tava dando erro de segmentação
+        //         mover2DirRed(raiz);
+
+        if(*raiz != NULL){
+            if((*raiz)->dir != NULL && (*raiz)->dir->esq != NULL){
+                if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK) // precisei mudar essa parte pq tava dando erro de segmentação
+                    mover2DirRed(raiz);
+            }
+            
 
             if(igualMenorMaior == 0){
                 removeLinha(&((*raiz)->info->ListaNum), linha, achou);
