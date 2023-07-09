@@ -8,7 +8,7 @@
 
 int cor(Rubro *raiz){
     int c;
-
+    
     if(raiz == NULL)
         c = BLACK;
     else
@@ -166,6 +166,7 @@ void lerArquivo(char *path, Rubro **raiz, int inseriu[]){
         palavra = strtok(frase, " ");
 
         while (palavra != NULL){
+            palavra[strcspn(palavra, "\n")] = '\0'; // strcspn(palavra, "\n") encontra a primeira posição de \n. e substtui por \0
             inserirRubro(raiz, palavra, linha, inseriu);
             palavra = strtok(NULL, " ");
         }
@@ -200,7 +201,7 @@ Rubro *buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]){
         }else if(igualMenorMaior < 0)
             buscarPalavra(raiz->esq, palavra, linha, achou);
         else
-            buscarPalavra(raiz->esq, palavra, linha, achou);
+            buscarPalavra(raiz->dir, palavra, linha, achou);
     }
     return aux;
 }
@@ -302,9 +303,15 @@ void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
             }
         }
 
-        if(*raiz != NULL){
-            if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK)
+        // if(*raiz != NULL && (*raiz)->info->ListaNum == NULL){
+        if(*raiz != NULL && (*raiz)->info->ListaNum == NULL){
+            if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK){ // precisei mudar essa parte pq tava dando erro de segmentação
                 mover2DirRed(raiz);
+            }
+            // if(cor((*raiz)->dir) == BLACK && (*raiz)->dir != NULL){ // precisei mudar essa parte pq tava dando erro de segmentação
+            //     if(cor((*raiz)->dir->esq) == BLACK)
+            //         mover2DirRed(raiz);
+            // }
 
             if(igualMenorMaior == 0){
                 removeLinha(&((*raiz)->info->ListaNum), linha, achou);
