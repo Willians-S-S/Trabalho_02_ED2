@@ -29,7 +29,7 @@ void lerArquivo(char *nomeArquivo, Rubro **raiz, int inseriu[]);
 
 Rubro *buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]);
 
-void buscaLinha(Linhas *no, int linha, int achou[]);
+int buscaLinha(Linhas *no, int linha, int achou[]);
 
 void balancear(Rubro **raiz);
 
@@ -39,11 +39,11 @@ void mover2DirRed(Rubro **raiz);
 
 void removeMenor(Rubro **raiz);
 
-void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]);
+int removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]);
 
-void removeLinha(Linhas **no, int linha, int achou[]);
+int removeLinha(Linhas **no, int linha, int achou[]);
 
-void auxRemover(Rubro **raiz, char *palavra, int linha, int achou[]);
+int auxRemover(Rubro **raiz, char *palavra, int linha, int achou[]);
 
 int cor(Rubro *raiz);
 
