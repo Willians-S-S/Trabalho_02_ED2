@@ -180,9 +180,9 @@ Rubro *buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]){
             aux = raiz;
             // buscaLinha(raiz->info->ListaNum, linha, achou);
         }else if(igualMenorMaior < 0)
-            buscarPalavra(raiz->esq, palavra, linha, achou);
+           aux = buscarPalavra(raiz->esq, palavra, linha, achou);
         else
-            buscarPalavra(raiz->dir, palavra, linha, achou);
+           aux = buscarPalavra(raiz->dir, palavra, linha, achou);
     }
     return aux;
 }
@@ -303,17 +303,12 @@ int removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
             
 
             if(igualMenorMaior == 0){
-                // removeLinha(&((*raiz)->info->ListaNum), linha, achou);
                     Rubro *aux;
                     aux = procuraMenor((*raiz)->dir);
                     strcpy((*raiz)->info->palavra, aux->info->palavra);
                     (*raiz)->info->ListaNum = aux->info->ListaNum;
                     removeMenor(&((*raiz)->dir));
                     flag = 1;
-                // if((*raiz)->info->ListaNum == NULL){
-                //     achou[3] = 1;
-                // }
-            
             }else
                 flag = removePalavra(&((*raiz)->dir), palavra, linha, achou);
         }
@@ -337,8 +332,9 @@ int auxRemover(Rubro **raiz, char *palavra, int linha, int achou[]){
         Rubro *aux;
 
         aux = buscarPalavra(*raiz, palavra, linha, achou); 
-
+        printf("%s", aux->info->palavra);
         if(aux){ // entra se encontou a palavra
+
             if(buscaLinha(aux->info->ListaNum, linha, achou)){ // entra se encontou a linha
                 if(removeLinha(&aux->info->ListaNum, linha, achou)){ // entra se removeu a linha
                     flag = 210; // -> removeu somente a linha
