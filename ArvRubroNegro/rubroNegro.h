@@ -55,12 +55,6 @@ void inserirPalavra(Rubro **raiz, char *palavra, int linha, int *inseriu);
 
 // void excluirPalavra();
 
-void imprimirLinhas(Linhas *no);
-
-void imprimeNo(Rubro *no);
-
-void imprimirAvr(Rubro *raiz);
-
 void inserirRubro(Rubro **raiz, char *palavra, int linha, int inseriu[]);
 
 void trocaCor(Rubro *raiz);

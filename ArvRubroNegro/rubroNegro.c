@@ -93,28 +93,6 @@ void inserirRubro(Rubro **raiz, char *palavra, int linha, int inseriu[]){
         (*raiz)->cor = BLACK;
 }
 
-void imprimirLinhas(Linhas *no){
-    if(no){
-        printf("%d ", no->linha);
-        imprimirLinhas(no->prox);
-    }
-
-}
-
-void imprimeNo(Rubro *no){
-    printf("Palavra: %s, cor: %d, linhas: ", no->info->palavra, cor(no));
-    imprimirLinhas(no->info->ListaNum);
-    printf("\n");
-}
-
-void imprimirAvr(Rubro *raiz){
-    if(raiz){
-        imprimeNo(raiz);
-        imprimirAvr(raiz->esq);
-        imprimirAvr(raiz->dir);
-    }
-}
-
 void trocaCor(Rubro *raiz){
     if(raiz){
         raiz->cor = !raiz->cor;
@@ -311,9 +289,10 @@ void removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
         //     if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK) // precisei mudar essa parte pq tava dando erro de segmentação
         //         mover2DirRed(raiz);
 
-        if(*raiz != NULL){
-            if((*raiz)->dir != NULL && (*raiz)->dir->esq != NULL){
-                if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK) // precisei mudar essa parte pq tava dando erro de segmentação
+        if(*raiz != NULL){ 
+            if((*raiz)->dir != NULL && (*raiz)->dir->esq != NULL){ // Essa condição tá aqui pq o nó deveria ter sido removido anteriomente, mas as vezes não vai ser pq só é removido quando todas linhas terminam.
+            
+                if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK) 
                     mover2DirRed(raiz);
             }
             
