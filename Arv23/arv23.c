@@ -70,30 +70,36 @@ Arv23 *criaNO(Info *info, Arv23 *noEsq, Arv23 *noCentro) {
     return no;
 }
 
-void *adicionaNo(Arv23 **raiz, Info *info, Arv23 *Novo) {
+void adicionaNo(Arv23 **raiz, Info *info, Arv23 *Novo) {
+    /*  
+    A função adicionaNo adiciona um novo nó à árvore 2-3. O parâmetro raiz é um ponteiro
+    para o ponteiro da raiz da árvore. O parâmetro info é um ponteiro para a estrutura Info
+    a ser adicionada ao nó. O parâmetro Novo é um ponteiro para o novo nó que será adicionado.
+ 
+    Se a palavra em info for maior que a palavra no primeiro nó da raiz, o campo info2 e dir da
+    raiz são atualizados com os valores fornecidos. Caso contrário, o campo info2 é atualizado
+    com o valor do campo info1 da raiz, e o campo info1 da raiz é atualizado com o valor de info.
+    Os campos dir e centro da raiz são atualizados com os valores de Novo e do campo centro da raiz,
+    respectivamente.
+
+    Parâmetros:
+        raiz: Um ponteiro para a raiz da árvore.
+        info: A informação a ser adicionada à árvore.
+        Novo: O novo nó a ser adicionado à árvore.
     
-    // (*raiz)->info2 = (Info *) malloc(sizeof(Info)); // alocando a info 2
+    Retorno: 
+        Não possui retorno, mas o ponteiro de informações na raiz da árvore é alterada/adicionado.
+    */
 
     if(strcmp(info->palavra, (*raiz)->info1->palavra) > 0){
-        // (*raiz)->info2->palavra = (char*) malloc((strlen(palavra) + 1) * sizeof(char));
-        // strcmp((*raiz)->info2->palavra, palavra);
-        // (*raiz)->info2->ListaNum = lista;
         (*raiz)->info2 = info;
         (*raiz)->dir = Novo;
     }else{
         (*raiz)->info2 = (*raiz)->info1;
         (*raiz)->info1 = info; 
-        // (*raiz)->info2->palavra = (char*) malloc((strlen((*raiz)->info1->palavra) + 1) * sizeof(char));
-        // strcmp((*raiz)->info2->palavra, (*raiz)->info1->palavra);
-        // (*raiz)->info2->ListaNum = (*raiz)->info1->ListaNum;
-
-        // (*raiz)->info1->palavra = realloc(palavra, strlen(palavra) + 1);
-        // strcmp((*raiz)->info1->palavra, palavra);
-        // (*raiz)->info1->ListaNum = lista;
 
         (*raiz)->dir = (*raiz)->centro;
         (*raiz)->centro = Novo;
-
     }
 }
 
@@ -109,6 +115,8 @@ void inserirLinha(Linhas **no, int linha){
         inserirLinha(&((*no)->prox), linha);
 }
 
+
+
 Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, char *sobe, Linhas **listaSobe, Info **infoSobe){
     Arv23 *maiorNo;
     Linhas *auxLista;
@@ -119,19 +127,14 @@ Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, char *s
     }else{
         if(folha(*raiz)){
             if((*raiz)->numInfo == 1){
-                
-                inserirLinha(&auxLista, linha);
-
-                adicionaNo(raiz, palavra, auxLista, NULL);
+                adicionaNo(raiz, criaInfo(palavra, NULL, linha), NULL);
                 maiorNo = NULL;
-
             }else{
                 maiorNo = quebraNo(raiz, palavra, sobe, listaSobe, NULL);
 
                 if(pai == NULL){
                     *raiz = criaNo(sobe, *raiz, maiorNo);
                     inserirLinha(&((*raiz)->info1->ListaNum), linha);
-                    // inserir lista
                     maiorNo = NULL;
                 }
             }
