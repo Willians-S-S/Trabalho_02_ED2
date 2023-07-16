@@ -39,7 +39,7 @@ void mover2DirRed(Rubro **raiz);
 
 void removeMenor(Rubro **raiz);
 
-int removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]);
+int removePalavra(Rubro **raiz, char *palavra);
 
 int removeLinha(Linhas **no, int linha, int achou[]);
 

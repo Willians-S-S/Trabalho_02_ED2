@@ -265,7 +265,22 @@ void balancear(Rubro **raiz){
     }
 }
 
-int removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
+int removePalavra(Rubro **raiz, char *palavra){
+/*
+Remove uma palavra de uma árvore Rubro Negro.
+
+  Args:
+    raiz: Ponteiro para a raiz da árvore.
+    palavra: A palavra a ser removida.
+    linha: A linha da palavra na lista de palavras.
+    achou: Um vetor booleano que indica se a palavra foi encontrada na árvore.
+
+  Returns:
+    1: Se a palavra foi encontrada e removida da árvore.
+    0: Se a palavra não foi encontrada na árvore.
+
+*/
+    
     int igualMenorMaior, flag = 0;
 
     igualMenorMaior = strcmp(palavra, (*raiz)->info->palavra);
@@ -275,7 +290,7 @@ int removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
         if(cor((*raiz)->esq) == BLACK && (*raiz)->esq->esq == BLACK)
             mover2EsqRed(raiz);
 
-        flag = removePalavra(&((*raiz)->esq), palavra, linha, achou);
+        flag = removePalavra(&((*raiz)->esq), palavra);
 
     }else{
         if(cor((*raiz)->esq) == RED)
@@ -285,32 +300,19 @@ int removePalavra(Rubro **raiz, char *palavra, int linha, int achou[]){
             free(*raiz);
             *raiz = NULL;
             flag = 1;
-            // removeLinha(&((*raiz)->info->ListaNum), linha, achou);
-            
-            // if((*raiz)->info->ListaNum == NULL){
-                // free(*raiz);
-                // *raiz = NULL;
-                // achou[3] = 1;
-            // }
-        }
-
-        if(*raiz != NULL){ 
-            if((*raiz)->dir != NULL && (*raiz)->dir->esq != NULL){ // Essa condição tá aqui pq o nó deveria ter sido removido anteriomente, mas as vezes não vai ser pq só é removido quando todas linhas terminam.
-            
-                if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK) 
+        }else{
+            if(cor((*raiz)->dir) == BLACK && cor((*raiz)->dir->esq) == BLACK) 
                     mover2DirRed(raiz);
-            }
             
-
             if(igualMenorMaior == 0){
-                    Rubro *aux;
-                    aux = procuraMenor((*raiz)->dir);
-                    strcpy((*raiz)->info->palavra, aux->info->palavra);
-                    (*raiz)->info->ListaNum = aux->info->ListaNum;
-                    removeMenor(&((*raiz)->dir));
-                    flag = 1;
+                Rubro *aux;
+                aux = procuraMenor((*raiz)->dir);
+                strcpy((*raiz)->info->palavra, aux->info->palavra);
+                (*raiz)->info->ListaNum = aux->info->ListaNum;
+                removeMenor(&((*raiz)->dir));
+                flag = 1;
             }else
-                flag = removePalavra(&((*raiz)->dir), palavra, linha, achou);
+                flag = removePalavra(&((*raiz)->dir), palavra);
         }
     }
     balancear(raiz);
@@ -334,12 +336,11 @@ int auxRemover(Rubro **raiz, char *palavra, int linha, int achou[]){
         aux = buscarPalavra(*raiz, palavra, linha, achou); 
         printf("%s", aux->info->palavra);
         if(aux){ // entra se encontou a palavra
-
             if(buscaLinha(aux->info->ListaNum, linha, achou)){ // entra se encontou a linha
                 if(removeLinha(&aux->info->ListaNum, linha, achou)){ // entra se removeu a linha
                     flag = 210; // -> removeu somente a linha
                     if(aux->info->ListaNum == NULL){ // entra se a palavra não existe em mais nenhuma linha
-                        if(removePalavra(raiz, palavra, linha, achou)) // entra se a palavra foi removida
+                        if(removePalavra(raiz, palavra)) // entra se a palavra foi removida
                             flag = 200; // -> removeu a palavra e a linha
                         else
                             flag = 510; // -> não removeu a palavra
