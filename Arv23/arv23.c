@@ -3,6 +3,35 @@
 #include <stdlib.h>
 #include "arv23.h"
 
+void lerArquivo(char *path, Arv23 **raiz, int inseriu[]){
+    FILE *arquivo;
+    arquivo = fopen(path, "r");
+    Info *aux;
+    aux = NULL;
+
+    if(arquivo == NULL){
+        printf("Erro ao abrir o arquivo.");
+    }
+
+    char frase[100], *palavra;
+
+    int linha = 1;
+
+    while(fgets(frase, sizeof(frase), arquivo) != NULL){
+        palavra = strtok(frase, " ");
+
+        while (palavra != NULL){
+            palavra[strcspn(palavra, "\n")] = '\0'; // strcspn(palavra, "\n") encontra a primeira posição de \n. e substtui por \0
+            // Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe)
+            printf("%s\n",palavra);
+            inserePalavra(raiz, palavra, linha, NULL, &aux);
+            palavra = strtok(NULL, " ");
+        }
+        linha += 1;
+    }
+
+}
+
 // cria nó deve receber a palavra, ponteiro para lista, se esse ponteiro for nulo, deve-se criar a lista, pelo parametro linha, caso o ponteiro 
 // não seja nulo é setado o na info
 Info *criaInfo(char *palavra, Linhas *lista, int linha){
@@ -22,12 +51,12 @@ Info *criaInfo(char *palavra, Linhas *lista, int linha){
     Info *info;
     info = (Info*) malloc(sizeof(Info)); // Aloca memória para a estrutura `Info`.
 
-    info->palavra = (char*) malloc(sizeof(char) * (strlen(palavra) + 1)); // Aloca memória para a string `palavra`.
-    strcmp(info->palavra, palavra);
+    info->palavra = (char*) malloc((strlen(palavra) + 1) * sizeof(char)); // Aloca memória para a string `palavra`.
+    strcpy(info->palavra, palavra);
 
     if(lista == NULL){
         info->ListaNum = NULL;
-        inserirLinha(info->ListaNum, linha);
+        inserirLinha(&(info->ListaNum), linha);
     }else{
         info->ListaNum = lista;
     }
@@ -36,7 +65,8 @@ Info *criaInfo(char *palavra, Linhas *lista, int linha){
 
 // verificar se lista que vem de fora é NULL se for cria se não adiciona
 
-Arv23 *criaNO(Info *info, Arv23 *noEsq, Arv23 *noCentro) {
+
+Arv23 *criaNo(Info *info, Arv23 *noEsq, Arv23 *noCentro) {
     /*  
     
     A função criaNO aloca memória para um novo nó da árvore 2-3 e preenche seus campos
@@ -70,7 +100,7 @@ Arv23 *criaNO(Info *info, Arv23 *noEsq, Arv23 *noCentro) {
     return no;
 }
 
-void adicionaNo(Arv23 **raiz, Info *info, Arv23 *Novo) {
+void adicionaNo(Arv23 **raiz, Info *info, Arv23 *filho) {
     /*  
     A função adicionaNo adiciona um novo nó à árvore 2-3. O parâmetro raiz é um ponteiro
     para o ponteiro da raiz da árvore. O parâmetro info é um ponteiro para a estrutura Info
@@ -93,14 +123,15 @@ void adicionaNo(Arv23 **raiz, Info *info, Arv23 *Novo) {
 
     if(strcmp(info->palavra, (*raiz)->info1->palavra) > 0){
         (*raiz)->info2 = info;
-        (*raiz)->dir = Novo;
+        (*raiz)->dir = filho;
     }else{
         (*raiz)->info2 = (*raiz)->info1;
         (*raiz)->info1 = info; 
 
         (*raiz)->dir = (*raiz)->centro;
-        (*raiz)->centro = Novo;
+        (*raiz)->centro = filho;
     }
+    (*raiz)->numInfo = 2;
 }
 
 void inserirLinha(Linhas **no, int linha){
@@ -115,12 +146,45 @@ void inserirLinha(Linhas **no, int linha){
         inserirLinha(&((*no)->prox), linha);
 }
 
-
-
-Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, char *sobe, Linhas **listaSobe, Info **infoSobe){
+Arv23 *quebraNo(Arv23 **Raiz, Arv23 *filho, Info *info, Info **infoSobe) {
     Arv23 *maiorNo;
-    Linhas *auxLista;
-    auxLista = NULL;
+
+    if ((info->palavra, (*Raiz)->info2->palavra) > 0) {
+        *infoSobe = (*Raiz)->info2;
+        maiorNo = criaNo(info, (*Raiz)->dir, filho);
+    } 
+    
+    else if (strcmp(info->palavra, (*Raiz)->info1->palavra) < 0) {
+        *infoSobe = (*Raiz)->info1;
+        maiorNo = criaNo((*Raiz)->info2, (*Raiz)->centro, (*Raiz)->dir);
+        
+        (*Raiz)->info1 = info;
+        (*Raiz)->centro = maiorNo;
+    }
+
+    else {
+        *infoSobe = info;
+        maiorNo = criaNo((*Raiz)->info2, maiorNo, (*Raiz)->dir);  
+    }
+
+    (*Raiz)->numInfo = 1;
+    (*Raiz)->info2 = NULL;
+    (*Raiz)->dir = NULL; 
+
+    return maiorNo;
+}
+
+int folha(Arv23 *raiz){
+    int flag = 0;
+
+    if(raiz->esq == NULL)
+        flag = 1;
+    
+    return flag;
+}
+
+Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe){
+    Arv23 *maiorNo;
 
     if(*raiz == NULL){ 
         *raiz = criaNo(criaInfo(palavra, NULL, linha), NULL, NULL);
@@ -130,39 +194,43 @@ Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, char *s
                 adicionaNo(raiz, criaInfo(palavra, NULL, linha), NULL);
                 maiorNo = NULL;
             }else{
-                maiorNo = quebraNo(raiz, palavra, sobe, listaSobe, NULL);
+                maiorNo = quebraNo(raiz, NULL, criaInfo(palavra, NULL, linha), infoSobe);
 
                 if(pai == NULL){
-                    *raiz = criaNo(sobe, *raiz, maiorNo);
-                    inserirLinha(&((*raiz)->info1->ListaNum), linha);
+                    *raiz = criaNo(criaInfo(palavra, NULL, linha), *raiz, maiorNo);
                     maiorNo = NULL;
                 }
             }
         }else{
-            // if(strcmp(palavra, (*raiz)->info1->palavra) == 0)
-            //     adicionarLinha();
+            if(strcmp(palavra, (*raiz)->info1->palavra) == 0){
+                inserirLinha(&((*raiz)->info1->ListaNum), linha);
+                return NULL;
+            }
+
+            if((*raiz)->numInfo == 2){
+                if(strcmp(palavra, (*raiz)->info2->palavra) == 0){
+                    inserirLinha(&((*raiz)->info2->ListaNum), linha);
+                    return NULL;
+                }
+            }
             
-            // else if(strcmp(palavra, (*raiz)->info1->palavra) < 0)   
-            //     maiorNo = inserePalavra(&((*raiz)->esq), palavra, linha, *raiz, *sobe, listaSobe);
+            if(strcmp(palavra, (*raiz)->info1->palavra) < 0)   
+                maiorNo = inserePalavra(&((*raiz)->esq), palavra, linha, *raiz, infoSobe);
             
-            // else if(((*raiz)->numInfo == 1) || ((*raiz)->numInfo == 2 && strcmp(palavra, (*raiz)->info2->palavra) < 0))
-            //     maiorNo = inserePalavra(&((*raiz)->centro), palavra, linha, *raiz, *sobe, listaSobe);
-           
-            // else if(strcmp(palavra, (*raiz)->info2->palavra) == 0)
-            //     adicionarLinha();
+            else if(((*raiz)->numInfo == 1) || ((*raiz)->numInfo == 2 && strcmp(palavra, (*raiz)->info2->palavra) < 0))
+                maiorNo = inserePalavra(&((*raiz)->centro), palavra, linha, *raiz, infoSobe);
             
-            // else
-            //     maiorNo = inserePalavra(&((*raiz)->dir), palavra, linha, *raiz, *sobe, listaSobe);   
+            else
+                maiorNo = inserePalavra(&((*raiz)->dir), palavra, linha, *raiz, infoSobe);   
 
             if(maiorNo != NULL){
                 if((*raiz)->numInfo == 1){
-                    // adicionaNo();
+                    adicionaNo(raiz, *infoSobe, maiorNo);
                     maiorNo = NULL;
                 }else{
-                    maiorNo = quebraNo();
-                    
+                    maiorNo = quebraNo(raiz, maiorNo, criaInfo(palavra, NULL, linha), infoSobe);
                     if(pai == NULL){
-                        criaNo(sobe, *raiz, maiorNo);
+                        *raiz = criaNo(*infoSobe, *raiz, maiorNo);
                         maiorNo = NULL;
                     }
                 }
@@ -170,4 +238,81 @@ Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, char *s
         }
     }
     return maiorNo;
+}
+
+void auxiliaInsere(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe){
+    Info *aux;
+    aux = buscaPalavra(*raiz, palavra);
+
+    if(aux == NULL){
+        // printf("Eh null\n");
+        inserePalavra(raiz, palavra, linha, NULL, infoSobe);
+    }else{
+        printf("Nao Eh null\n");
+        inserirLinha(&(aux->ListaNum), linha);
+    }
+}
+
+// imprimir
+void imprimirLista(Linhas *no){
+    if(no != NULL){
+        printf("%d ", no->linha);
+        imprimirLista(no->prox);
+    }
+}
+
+void imprimirInfo(Info *info){
+    printf("%s, linhas: ", info->palavra);
+    imprimirLista(info->ListaNum);
+    printf("\n");
+}
+
+void imprimirArv(Arv23 *raiz){
+    if(raiz != NULL){
+        printf("\nInfo 1:\n");
+        imprimirInfo(raiz->info1);
+        if(raiz->numInfo == 2){
+            printf("Info 2:\n");
+            imprimirInfo(raiz->info2);
+        }
+        imprimirArv(raiz->esq);
+        imprimirArv(raiz->centro);
+        imprimirArv(raiz->dir);
+    }
+}
+
+// busca
+
+Info *buscaPalavra(Arv23 *raiz, char *palavra){
+    Info *aux;
+    aux = NULL;
+
+    // if(raiz != NULL){
+    //     if(strcmp(palavra, raiz->info1->palavra) == 0)
+    //         return raiz->info1;
+    //     else if(raiz->numInfo == 2){
+    //         if(strcmp(palavra, raiz->info2->palavra) == 0)
+    //             return raiz->info2;
+        
+    //     }if(strcmp(palavra, raiz->info1->palavra) < 0)   
+    //         aux = buscaPalavra(raiz->esq, palavra);
+        
+    //     else if((raiz->numInfo == 1) || (raiz->numInfo == 2 && strcmp(palavra, raiz->info2->palavra) < 0))
+    //         aux = buscaPalavra(raiz->centro, palavra);
+
+    //     else
+    //         aux = buscaPalavra(raiz->dir, palavra);
+    // }
+    // if(raiz != NULL){
+    //     if(strcmp(palavra, raiz->info1->palavra) == 0)
+    //         return raiz->info1;
+    //     if(raiz->numInfo == 2){
+    //         if(strcmp(palavra, raiz->info2->palavra) == 0)
+    //             return raiz->info2;
+    //     }
+    //     imprimirArv(raiz->esq);
+    //     imprimirArv(raiz->centro);
+    //     imprimirArv(raiz->dir);
+    // }
+    // return aux;
 }
