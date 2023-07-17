@@ -48,4 +48,4 @@ void imprimirInfo(Info *info);
 void imprimirArv(Arv23 *raiz);
 
 //busca
-Info *buscaPalavra(Arv23 *raiz, char *palavra);
+Info *buscaPalavra(Arv23 *raiz, char *palavra, Info **aux);
