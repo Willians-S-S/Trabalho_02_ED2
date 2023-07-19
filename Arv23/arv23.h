@@ -49,3 +49,8 @@ void imprimirArv(Arv23 *raiz);
 
 //busca
 Info *buscaPalavra(Arv23 *raiz, char *palavra, Info **aux);
+
+// Remover
+void MaiorInfoRemoveEsq(Arv23 **raiz, Arv23** PaiMaior, Arv23** MaiorInfoRemove, int LocalInfo);
+void Redistribui(Arv23 **raiz, Arv23 **pai);
+void remover23(Arv23 **pai, Arv23 **raiz, char *palavra);

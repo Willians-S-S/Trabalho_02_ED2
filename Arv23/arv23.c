@@ -315,3 +315,210 @@ Info *buscaPalavra(Arv23 *raiz, char *palavra, Info **aux){
     // }
     // return aux;
 }
+
+// Remover
+
+void MaiorInfoRemoveEsq(Arv23 **raiz, Arv23** PaiMaior, Arv23** MaiorInfoRemove, int LocalInfo) {
+    if (MaiorInfoRemove != NULL) {
+        if ((*MaiorInfoRemove)->esq == NULL) {
+            Info *aux;
+            aux = NULL;
+            if (LocalInfo == 1) {
+                aux = (*raiz)->info1;
+
+                if ((*MaiorInfoRemove)->numInfo == 2) {
+                    (*raiz)->info1 = (*MaiorInfoRemove)->info2;
+                    (*MaiorInfoRemove)->info2 = aux;
+                }
+                else {
+                    (*raiz)->info1 = (*MaiorInfoRemove)->info1;
+                    (*MaiorInfoRemove)->info1 = aux;
+                }
+
+            }
+            else if (LocalInfo == 2) {
+                aux = (*raiz)->info2;
+
+                if ((*MaiorInfoRemove)->numInfo == 2) {
+                    (*raiz)->info2 = (*MaiorInfoRemove)->info2;
+                    (*MaiorInfoRemove)->info2 = aux;
+                }
+                else {
+                    (*raiz)->info2 = (*MaiorInfoRemove)->info1;
+                    (*MaiorInfoRemove)->info1 = aux;
+                }
+
+            }
+
+            remover23(PaiMaior, MaiorInfoRemove, aux);
+        }
+        else {
+            if ((*MaiorInfoRemove)->numInfo == 2) {
+                MaiorInfoRemoveEsq(raiz, MaiorInfoRemove, &((*MaiorInfoRemove)->dir), LocalInfo);
+            }
+            else if ((*MaiorInfoRemove)->numInfo == 1) {
+                MaiorInfoRemoveEsq(raiz, MaiorInfoRemove, &((*MaiorInfoRemove)->centro), LocalInfo);
+            }
+        } 
+    }
+    Redistribui(MaiorInfoRemove, PaiMaior);
+}
+
+void Redistribui(Arv23 **raiz, Arv23 **pai) {
+    if (*raiz != NULL)
+        if ((*raiz)->numInfo == 0) {
+            if (pai != NULL) {
+                if ((*raiz) == ((*pai)->dir)) {
+                    if ((*pai)->centro->numInfo == 2) {
+                        (*raiz)->info1 = (*pai)->info1;
+                        (*raiz)->numInfo = 1;
+                        (*pai)->info2 = (*pai)->centro->info2;
+                        (*pai)->centro->numInfo = 1;
+                        (*raiz)->esq = (*pai)->centro->dir;
+                        (*pai)->centro->dir = NULL;
+                    }
+                    else if ((*pai)->centro->numInfo == 1) {
+                        (*raiz)->info2 = (*pai)->info2;
+                        (*raiz)->dir = (*raiz)->centro;
+                        (*raiz)->info1 = (*pai)->centro->info1;
+                        (*raiz)->numInfo = 2;
+                        (*pai)->numInfo = 1;
+                        (*raiz)->centro = (*pai)->centro->centro;
+                        (*raiz)->esq = (*pai)->centro->esq;
+                        free((*pai)->centro);
+                        (*pai)->centro = (*raiz);
+                        (*pai)->dir = NULL;
+                    }
+                }
+                else if ((*raiz) == (*pai)->centro) {
+                    if ((*pai)->esq->numInfo == 2) {
+                        (*raiz)->info1 = (*pai)->info1;
+                        (*raiz)->numInfo = 1;
+                        (*pai)->info1 = (*pai)->esq->info2;
+                        (*pai)->esq->numInfo = 1;
+                        (*raiz)->esq = (*pai)->esq->dir;
+                        (*pai)->esq->dir = NULL;
+                    }
+                    else if ((*pai)->esq->numInfo == 1) {
+                        if ((*pai)->numInfo == 2) {
+                            (*raiz)->info2 = (*pai)->info1;
+                            (*raiz)->info1 = (*pai)->esq->info1;
+                            (*raiz)->numInfo = 2;
+                            (*raiz)->dir = (*raiz)->centro;
+                            (*raiz)->centro = (*pai)->esq->centro;
+                            (*raiz)->esq = (*pai)->esq->esq;
+                            free((*pai)->esq);
+                            (*pai)->esq = (*raiz);
+                            (*pai)->info1 = (*pai)->info2;
+                            (*pai)->numInfo = 1;
+                            (*pai)->centro = (*pai)->dir;
+                            (*pai)->dir = NULL;
+                        }
+                        else if ((*pai)->numInfo == 1) {
+                            (*raiz)->info2 = (*pai)->info1;
+                            (*raiz)->info1 = (*pai)->esq->info1;
+                            (*raiz)->numInfo = 2;
+                            (*pai)->numInfo = 0;
+                            (*raiz)->dir = (*raiz)->centro;
+                            (*raiz)->centro = (*pai)->esq->centro;
+                            (*raiz)->esq = (*pai)->esq->esq;
+                            free((*pai)->esq);
+                            (*pai)->esq = NULL;
+                        }
+                    }
+                }
+                else if ((*raiz) == (*pai)->esq) {
+                    if ((*pai)->centro->numInfo == 2) {
+                        (*raiz)->info1 = (*pai)->info1;
+                        (*raiz)->numInfo = 1;
+                        (*pai)->info1 = (*pai)->centro->info1;
+                        (*pai)->centro->numInfo = 1;
+                        (*pai)->centro->info1 = (*pai)->centro->info2;
+                        (*raiz)->esq = (*raiz)->centro;
+                        (*raiz)->centro = (*pai)->centro->esq;
+                        (*pai)->centro->esq = (*pai)->centro->centro;
+                        (*pai)->centro->centro = (*pai)->centro->dir;
+                        (*pai)->centro->dir = NULL;
+                    }
+                    else if ((*pai)->centro->numInfo == 1) {
+                        if ((*pai)->numInfo == 2) {
+                            (*raiz)->info1 = (*pai)->info1;
+                            (*raiz)->info2 = (*pai)->centro->info1;
+                            (*raiz)->numInfo = 2;
+                            (*raiz)->esq = (*raiz)->centro;
+                            (*raiz)->centro = (*pai)->centro->esq;
+                            (*raiz)->dir = (*pai)->centro->centro;
+                            (*pai)->info1 = (*pai)->info2;
+                            (*pai)->numInfo = 1;
+                            free((*pai)->centro);
+                            (*pai)->centro = (*pai)->dir;
+                            (*pai)->dir = NULL;
+                        }
+                        else if ((*pai)->numInfo == 1) {
+                            (*raiz)->info1 = (*pai)->info1;
+                            (*raiz)->esq = (*raiz)->centro;
+                            (*raiz)->info2 = (*pai)->centro->info1;
+                            (*raiz)->centro = (*pai)->centro->esq;
+                            (*raiz)->dir = (*pai)->centro->centro;
+                            (*pai)->numInfo = 0;
+                            (*raiz)->numInfo = 2;
+                            free((*pai)->centro);
+                            (*pai)->centro = (*raiz);
+                            (*pai)->esq = NULL;
+                        }
+                    }
+                }
+            }
+            else if (pai == NULL) {
+                (*raiz) = (*raiz)->centro;
+            }
+            else if (folha(*raiz) == 0 && pai == NULL){
+                free(*raiz);
+                *raiz = NULL;
+            }    
+        }
+}
+
+void remover23(Arv23 **pai, Arv23 **raiz, char *palavra){
+	if (*raiz != NULL) {
+        if(strcmp(palavra, (*raiz)->info1->palavra) == 0){
+            if(folha(*raiz)) {
+                if((*raiz)->numInfo == 2) {
+                    (*raiz)->info1 = (*raiz)->info2;
+                    (*raiz)->numInfo = 1;
+
+                    // free((*raiz)->info2->palavra);
+                }
+                else if((*raiz)->numInfo == 1){
+                    (*raiz)->numInfo = 0;
+                }
+            }
+            else {
+                Arv23 **MaiorInfoRemove = &((*raiz)->esq);
+                Arv23 **PaiMaior = raiz;
+                MaiorInfoRemoveEsq(raiz, PaiMaior, MaiorInfoRemove, 1);
+            }
+        }
+        else if ((*raiz)->numInfo == 2 && strcmp(palavra, (*raiz)->info2) == 0) {
+            if (folha(*raiz)) {
+                (*raiz)->numInfo = 1;
+            }
+            else {
+                Arv23 **MaiorInfoRemove = &((*raiz)->centro);
+                Arv23 **PaiMaior = raiz;
+                MaiorInfoRemoveEsq(raiz, PaiMaior, MaiorInfoRemove, 2);
+            }
+        }
+        
+		else if (strcmp(palavra, (*raiz)->info1->palavra) < 0) {
+            remover23(raiz, &((*raiz)->esq), palavra);
+        }
+        else if ((*raiz)->numInfo == 1 || (*raiz)->numInfo == 2 && strcmp(palavra, (*raiz)->info2->palavra) < 0) {
+            remover23(raiz, &((*raiz)->centro), palavra);
+        }
+        else {
+            remover23(raiz, &((*raiz)->dir), palavra);
+        }
+    }
+    Redistribui(raiz, pai);
+}
