@@ -321,31 +321,34 @@ Info *buscaPalavra(Arv23 *raiz, char *palavra, Info **aux){
 void MaiorInfoRemoveEsq(Arv23 **raiz, Arv23** PaiMaior, Arv23** MaiorInfoRemove, int LocalInfo) {
     if (MaiorInfoRemove != NULL) {
         if ((*MaiorInfoRemove)->esq == NULL) {
-            Info *aux;
-            aux = NULL;
+            char *aux;
+            // aux = NULL;
+            aux = (char *) malloc(sizeof(char) * 50);
+            strcpy(aux, "NOT FOUND");
+
             if (LocalInfo == 1) {
-                aux = (*raiz)->info1;
+                strcpy(aux, (*raiz)->info1->palavra);
 
                 if ((*MaiorInfoRemove)->numInfo == 2) {
-                    (*raiz)->info1 = (*MaiorInfoRemove)->info2;
-                    (*MaiorInfoRemove)->info2 = aux;
+                    strcpy((*raiz)->info1->palavra, (*MaiorInfoRemove)->info2->palavra);
+                    strcpy((*MaiorInfoRemove)->info2->palavra, aux);
                 }
                 else {
-                    (*raiz)->info1 = (*MaiorInfoRemove)->info1;
-                    (*MaiorInfoRemove)->info1 = aux;
+                    strcpy((*raiz)->info1->palavra, (*MaiorInfoRemove)->info1->palavra);
+                    strcpy((*MaiorInfoRemove)->info1->palavra, aux);
                 }
 
             }
             else if (LocalInfo == 2) {
-                aux = (*raiz)->info2;
+                strcpy(aux, (*raiz)->info2->palavra);
 
                 if ((*MaiorInfoRemove)->numInfo == 2) {
-                    (*raiz)->info2 = (*MaiorInfoRemove)->info2;
-                    (*MaiorInfoRemove)->info2 = aux;
+                    strcpy((*raiz)->info2->palavra, (*MaiorInfoRemove)->info2->palavra);
+                    strcpy((*MaiorInfoRemove)->info2->palavra, aux);
                 }
                 else {
-                    (*raiz)->info2 = (*MaiorInfoRemove)->info1;
-                    (*MaiorInfoRemove)->info1 = aux;
+                    strcpy((*raiz)->info2->palavra, (*MaiorInfoRemove)->info1->palavra);
+                    strcpy((*MaiorInfoRemove)->info1->palavra, aux);
                 }
 
             }
@@ -499,7 +502,7 @@ void remover23(Arv23 **pai, Arv23 **raiz, char *palavra){
                 MaiorInfoRemoveEsq(raiz, PaiMaior, MaiorInfoRemove, 1);
             }
         }
-        else if ((*raiz)->numInfo == 2 && strcmp(palavra, (*raiz)->info2) == 0) {
+        else if ((*raiz)->numInfo == 2 && strcmp(palavra, (*raiz)->info2->palavra) == 0) {
             if (folha(*raiz)) {
                 (*raiz)->numInfo = 1;
             }
