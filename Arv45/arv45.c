@@ -137,7 +137,7 @@ Arv23 *quebraNo(Arv23 **raiz, int info, int *sobe, Arv23 *filho){
 
     }else if(info > (*raiz)->info_2){
         *sobe = info;
-
+        
         maiorNo = criaNo((*raiz)->info_3, (*raiz)->centro, (*raiz)->centro_dir);
         
         maiorNo->info_2 = (*raiz)->info_4;
@@ -148,10 +148,12 @@ Arv23 *quebraNo(Arv23 **raiz, int info, int *sobe, Arv23 *filho){
 
     }else if(info > (*raiz)->info_1){
         *sobe = (*raiz)->info_2;
-
+        // if(info == 126)
+        //     printf("Eh igual 126\n");
         maiorNo = criaNo((*raiz)->info_3, (*raiz)->centro, (*raiz)->centro_dir);
         
         maiorNo->info_2 = (*raiz)->info_4;
+        // printf("Valor: %d\n", (*raiz)->centro->info_1);
 
         maiorNo->centro = (*raiz)->dir;
 
@@ -165,7 +167,9 @@ Arv23 *quebraNo(Arv23 **raiz, int info, int *sobe, Arv23 *filho){
 
         maiorNo = criaNo((*raiz)->info_3, (*raiz)->centro, (*raiz)->centro_dir);
         
+        // printf("Info3: %d, Info4: %d\n", (*raiz)->info_3, (*raiz)->info_4);
         maiorNo->info_2 = (*raiz)->info_4;
+        // printf("Maior1: %d, Maior2: %d\n", maiorNo->info_1, maiorNo->info_2);
 
         maiorNo->centro = (*raiz)->dir;
 
@@ -176,11 +180,13 @@ Arv23 *quebraNo(Arv23 **raiz, int info, int *sobe, Arv23 *filho){
         
         (*raiz)->info_1 = info;
         (*raiz)->centro_esq = filho;
+        // printf("Info3: %d, Info4: %d\n", (*raiz)->info_3, (*raiz)->info_4);
 
     }
 
     (*raiz)->qtdInfo = 2;
-    // (*raiz)->centro = NULL;
+    (*raiz)->centro_dir = NULL;
+    (*raiz)->dir = NULL;
 
     return maiorNo;
     
@@ -235,7 +241,7 @@ Arv23 *insere23(Arv23 **raiz, int info, Arv23 *pai, int *sobe){
                     maiorNO = NULL;
                 }else{
                     maiorNO = quebraNo(raiz, *sobe, sobe, maiorNO);
-
+                    // printf("Maior1: %d, Maior2: %d\n", maiorNO->info_1, maiorNO->info_2);
                     if(pai == NULL){
                         *raiz = criaNo(*sobe, *raiz, maiorNO);
                         maiorNO = NULL;
@@ -288,9 +294,20 @@ int main(){
     insere23(&Raiz, 105, NULL, &sobe);
     insere23(&Raiz, 285, NULL, &sobe);
     insere23(&Raiz, 126, NULL, &sobe);
-    // insere23(&Raiz, 556, NULL, &sobe);
-    // insere23(&Raiz, 795, NULL, &sobe);
-    // insere23(&Raiz, 899, NULL, &sobe);
+    insere23(&Raiz, 556, NULL, &sobe);
+    insere23(&Raiz, 795, NULL, &sobe);
+    insere23(&Raiz, 899, NULL, &sobe);
+    
+    insere23(&Raiz, 502, NULL, &sobe);
+    insere23(&Raiz, 866, NULL, &sobe);
+    insere23(&Raiz, 725, NULL, &sobe);
+    insere23(&Raiz, 581, NULL, &sobe);
+    insere23(&Raiz, 408, NULL, &sobe);
+    insere23(&Raiz, 348, NULL, &sobe);
+    insere23(&Raiz, 575, NULL, &sobe);
+    insere23(&Raiz, 719, NULL, &sobe);
+    insere23(&Raiz, 983, NULL, &sobe);
+    insere23(&Raiz, 63, NULL, &sobe);
 
     // insere23(&Raiz, 10, NULL, &sobe);
     // insere23(&Raiz, 11, NULL, &sobe);
