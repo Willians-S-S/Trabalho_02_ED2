@@ -209,11 +209,11 @@ Arv23 *insere23(Arv23 **raiz, int info, Arv23 *pai, int *sobe){
             if(info < (*raiz)->info_1)
                 maiorNO = insere23(&((*raiz)->esq), info, *raiz, sobe);
 
-            else if((*raiz)->qtdInfo == 1 || ((*raiz)->qtdInfo == 2 && info < (*raiz)->info_2))
+            else if((*raiz)->qtdInfo == 1 || ((*raiz)->qtdInfo <= 4 && info < (*raiz)->info_2))
                 maiorNO = insere23(&((*raiz)->centro_esq), info, *raiz, sobe);
 
             // else if((info > (*raiz)->info_2 && (*raiz)->qtdInfo == 2)  || ((*raiz)->qtdInfo == 3 && info < (*raiz)->info_3))
-            else if(((*raiz)->qtdInfo == 2)  || ((*raiz)->qtdInfo == 3 && info < (*raiz)->info_3))
+            else if(((*raiz)->qtdInfo == 2)  || ((*raiz)->qtdInfo <= 4 && info < (*raiz)->info_3))
                 maiorNO = insere23(&((*raiz)->centro), info, *raiz, sobe);
 
             // else if((*raiz)->qtdInfo == 2 || ((*raiz)->qtdInfo == 3 && info < (*raiz)->info_3))
@@ -271,17 +271,40 @@ int main(){
     int sobe; 
 
     // insere23(&Raiz, 400, NULL, &sobe);
-    insere23(&Raiz, 1, NULL, &sobe);
-    insere23(&Raiz, 2, NULL, &sobe);
-    insere23(&Raiz, 3, NULL, &sobe);
-    insere23(&Raiz, 4, NULL, &sobe);
-    insere23(&Raiz, 5, NULL, &sobe);
-    insere23(&Raiz, 6, NULL, &sobe);
-    insere23(&Raiz, 7, NULL, &sobe);
-    insere23(&Raiz, 8, NULL, &sobe);
-    insere23(&Raiz, 9, NULL, &sobe);
-    insere23(&Raiz, 10, NULL, &sobe);
-    insere23(&Raiz, 11, NULL, &sobe);
+    insere23(&Raiz, 721, NULL, &sobe);
+    insere23(&Raiz, 670, NULL, &sobe);
+    insere23(&Raiz, 570, NULL, &sobe);
+    insere23(&Raiz, 922, NULL, &sobe);
+    insere23(&Raiz, 130, NULL, &sobe);
+    insere23(&Raiz, 345, NULL, &sobe);
+    insere23(&Raiz, 797, NULL, &sobe);
+    insere23(&Raiz, 385, NULL, &sobe);
+    insere23(&Raiz, 874, NULL, &sobe);
+    insere23(&Raiz, 405, NULL, &sobe);
+    insere23(&Raiz, 652, NULL, &sobe);
+    insere23(&Raiz, 491, NULL, &sobe);
+    insere23(&Raiz, 830, NULL, &sobe);
+    insere23(&Raiz, 443, NULL, &sobe);
+    insere23(&Raiz, 105, NULL, &sobe);
+    insere23(&Raiz, 285, NULL, &sobe);
+    insere23(&Raiz, 126, NULL, &sobe);
+    // insere23(&Raiz, 556, NULL, &sobe);
+    // insere23(&Raiz, 795, NULL, &sobe);
+    // insere23(&Raiz, 899, NULL, &sobe);
+
+    // insere23(&Raiz, 10, NULL, &sobe);
+    // insere23(&Raiz, 11, NULL, &sobe);
+    // insere23(&Raiz, 1, NULL, &sobe);
+    // insere23(&Raiz, 2, NULL, &sobe);
+    // insere23(&Raiz, 3, NULL, &sobe);
+    // insere23(&Raiz, 4, NULL, &sobe);
+    // insere23(&Raiz, 5, NULL, &sobe);
+    // insere23(&Raiz, 6, NULL, &sobe);
+    // insere23(&Raiz, 7, NULL, &sobe);
+    // insere23(&Raiz, 8, NULL, &sobe);
+    // insere23(&Raiz, 9, NULL, &sobe);
+    // insere23(&Raiz, 10, NULL, &sobe);
+    // insere23(&Raiz, 11, NULL, &sobe);
     // insere23(&Raiz, 900, NULL, &sobe);
     // insere23(&Raiz, 1000,NULL, &sobe);
     // insere23(&Raiz, 600, NULL, &sobe);
