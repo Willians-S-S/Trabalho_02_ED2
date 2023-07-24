@@ -253,22 +253,46 @@ Arv23 *insere23(Arv23 **raiz, int info, Arv23 *pai, int *sobe){
     return maiorNO;
 }
 
-void mostrar(Arv23 *Raiz) {
+// void mostrar(Arv23 *Raiz) {
+//     if (Raiz != NULL) {
+//         printf("%d ", Raiz->info_1);
+//         if(Raiz->qtdInfo == 2 || Raiz->qtdInfo > 2)
+//             printf("%d ", Raiz->info_2);
+//         if(Raiz->qtdInfo == 3 || Raiz->qtdInfo > 3)
+//             printf("%d ", Raiz->info_3);
+//         if(Raiz->qtdInfo == 4)
+//             printf("%d ", Raiz->info_4);
+//         printf("Quantidade de Info: %d\n", Raiz->qtdInfo);
+
+//         mostrar(Raiz->esq);
+//         mostrar(Raiz->centro_esq);
+//         mostrar(Raiz->centro);
+//         mostrar(Raiz->centro_dir);
+//         mostrar(Raiz->dir);
+//     }
+// }
+
+void mostrar(Arv23* Raiz, int nivel) {
     if (Raiz != NULL) {
+        // mostrar(Raiz->centro_dir, nivel + 1);
+
+        for (int i = 0; i < nivel; i++)
+            printf("   ");
+
         printf("%d ", Raiz->info_1);
-        if(Raiz->qtdInfo == 2 || Raiz->qtdInfo > 2)
+        if (Raiz->qtdInfo == 2 || Raiz->qtdInfo > 2)
             printf("%d ", Raiz->info_2);
-        if(Raiz->qtdInfo == 3 || Raiz->qtdInfo > 3)
+        if (Raiz->qtdInfo == 3 || Raiz->qtdInfo > 3)
             printf("%d ", Raiz->info_3);
-        if(Raiz->qtdInfo == 4)
+        if (Raiz->qtdInfo == 4)
             printf("%d ", Raiz->info_4);
         printf("Quantidade de Info: %d\n", Raiz->qtdInfo);
 
-        mostrar(Raiz->esq);
-        mostrar(Raiz->centro_esq);
-        mostrar(Raiz->centro);
-        mostrar(Raiz->centro_dir);
-        mostrar(Raiz->dir);
+        mostrar(Raiz->esq, nivel + 1);
+        mostrar(Raiz->centro_esq, nivel + 1);
+        mostrar(Raiz->centro, nivel + 1);
+         mostrar(Raiz->centro_dir, nivel + 1); // Impresso acima para melhor visualização
+        mostrar(Raiz->dir, nivel + 1);
     }
 }
 
@@ -338,7 +362,7 @@ int main(){
     // insere23(&Raiz, 470, NULL, &sobe);
     // insere23(&Raiz, 490, NULL, &sobe);
 
-    mostrar(Raiz);
+    mostrar(Raiz, 0);
 
     return 0;    
 }
