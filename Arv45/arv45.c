@@ -1,19 +1,90 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-typedef struct Arv23 Arv23;
-
-struct Arv23{
-    int info_1, info_2, info_3, info_4, qtdInfo;
-
-    Arv23 *esq, *centro_esq, *centro, *centro_dir, *dir;
+typedef struct Info Info;
+// s  informações  de  cada  calçado  são:  código, tipo,   marca,   tamanho,   quantidade   e   preço.
+struct Info{
+    int cod, tam, qtd, linha;
+    char *tipo, *marca;
+    float preco;
 };
 
-Arv23 *criaNo(int info, Arv23 * No_esq, Arv23 * No_centro_esq){
-    Arv23 *No;
-    No = (Arv23 *) malloc(sizeof(Arv23));
 
-    No->info_1 = info;
+typedef struct Arv45 Arv45;
+
+struct Arv45{
+    Info *info1, *info2, *info3, *info4;
+    int qtdInfo;
+
+    Arv45 *esq, *centro_esq, *centro, *centro_dir, *dir;
+};
+
+Arv45 *insere45(Arv45 **raiz, Arv45 *pai, Info **sobe, int cod, int tam, int qtd, int linha, char *tipo, char *marca, float preco);
+
+void lerArquivo(Arv45 **raiz, Info **sobe){
+    FILE *arquivo;
+    int cod, tam, qtd, linha;
+    char tipo[100], marca[100];
+    float preco;
+
+    // Abrir o arquivo para leitura
+    arquivo = fopen("loja.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        // return 1;
+    }
+
+    linha = 1;
+
+    // Ler cada linha do arquivo até o final
+    while (fscanf(arquivo, "%d %d %d %s %s %f\n", &cod, &tam, &qtd, tipo, marca, &preco) == 6) {
+        // Aqui você pode fazer o que desejar com os dados lidos de cada linha
+        // Por exemplo, imprimir os valores na tela
+        // printf("cod: %d\n", cod);
+        // printf("tam: %d\n", tam);
+        // printf("qtd: %d\n", qtd);
+        // printf("linha: %d\n", linha);
+        // printf("tipo: %s\n", tipo);
+        // printf("marca: %s\n", marca);
+        // printf("preco: %.2f\n", preco);
+
+        insere45(raiz, NULL, sobe, cod, tam, qtd, linha, tipo, marca, preco);
+
+        linha++;
+    }
+
+    // Fechar o arquivo
+    fclose(arquivo);
+}
+
+Info *criaInfo(int cod, int tam, int qtd, int linha, char *tipo, char *marca, float preco){
+    Info *info;
+
+    info = (Info*) malloc(sizeof(Info));
+
+    info->cod = cod;
+    info->tam = tam;
+    info->qtd = qtd;
+    info->linha = linha;
+
+
+    info->tipo = (char *) malloc(sizeof(char) *(strlen(tipo) + 1));
+    strcpy(info->tipo, tipo);
+
+    info->marca = (char *) malloc(sizeof(char) *(strlen(marca) + 1));
+    strcpy(info->marca, marca);
+
+    info->preco = preco;
+
+    return info;
+}
+
+Arv45 *criaNo(Info *info, Arv45 * No_esq, Arv45 * No_centro_esq){
+    Arv45 *No;
+    No = (Arv45 *) malloc(sizeof(Arv45));
+
+    No->info1 = info;
     No->qtdInfo = 1;
     No->esq = No_esq;
     No->centro_esq = No_centro_esq;
@@ -24,23 +95,23 @@ Arv23 *criaNo(int info, Arv23 * No_esq, Arv23 * No_centro_esq){
     return No;
 }
 
-int folha(Arv23 *No){
+int folha(Arv45 *No){
     int eh = 0;
     if(No->esq == NULL)
         eh = 1;
     return eh;
 }
 
-void adicionaNo(Arv23 **No, int info, Arv23 *filho){
+void adicionaNo(Arv45 **No, Info *info, Arv45 *filho){
 
     if((*No)->qtdInfo == 1){
-        if(info > (*No)->info_1){
-            (*No)->info_2 = info;
+        if(info->cod > (*No)->info1->cod){
+            (*No)->info2 = info;
             (*No)->centro = filho;
 
         }else{
-            (*No)->info_2 = (*No)->info_1;
-            (*No)->info_1 = info;
+            (*No)->info2 = (*No)->info1;
+            (*No)->info1 = info;
 
             (*No)->centro = (*No)->centro_esq;
             (*No)->centro_esq = filho;
@@ -50,21 +121,21 @@ void adicionaNo(Arv23 **No, int info, Arv23 *filho){
 
     }else if((*No)->qtdInfo == 2){
 
-        if(info > (*No)->info_2){
-            (*No)->info_3 = info;
+        if(info->cod > (*No)->info2->cod){
+            (*No)->info3 = info;
             (*No)->centro_dir = filho;
 
-        }else if(info > (*No)->info_1 && info < (*No)->info_2){
-            (*No)->info_3 = (*No)->info_2;
-            (*No)->info_2 = info;
+        }else if(info->cod > (*No)->info1->cod && info->cod < (*No)->info2->cod){
+            (*No)->info3 = (*No)->info2;
+            (*No)->info2 = info;
 
             (*No)->centro_dir = (*No)->centro;
             (*No)->centro = filho;
 
         }else{
-            (*No)->info_3 = (*No)->info_2;
-            (*No)->info_2 = (*No)->info_1;
-            (*No)->info_1 = info;
+            (*No)->info3 = (*No)->info2;
+            (*No)->info2 = (*No)->info1;
+            (*No)->info1 = info;
 
             (*No)->centro_dir = (*No)->centro;
             (*No)->centro = (*No)->centro_esq;
@@ -74,31 +145,31 @@ void adicionaNo(Arv23 **No, int info, Arv23 *filho){
         (*No)->qtdInfo = 3;
 
     }else{
-        if(info > (*No)->info_3){
-            (*No)->info_4 = info;
+        if(info->cod > (*No)->info3->cod){
+            (*No)->info4 = info;
             (*No)->dir = filho;
 
-        }else if(info > (*No)->info_2 && info < (*No)->info_3){
-            (*No)->info_4 = (*No)->info_3;
-            (*No)->info_3 = info;
+        }else if(info->cod > (*No)->info2->cod && info->cod < (*No)->info3->cod){
+            (*No)->info4 = (*No)->info3;
+            (*No)->info3 = info;
 
             (*No)->dir = (*No)->centro_dir;
             (*No)->centro_dir = filho;
 
-        }else if (info > (*No)->info_1 && info < (*No)->info_2){
-            (*No)->info_4 = (*No)->info_3;
-            (*No)->info_3 = (*No)->info_2;
-            (*No)->info_2 = info;
+        }else if (info->cod > (*No)->info1->cod && info->cod < (*No)->info2->cod){
+            (*No)->info4 = (*No)->info3;
+            (*No)->info3 = (*No)->info2;
+            (*No)->info2 = info;
 
             (*No)->dir = (*No)->centro_dir;
             (*No)->centro_dir = (*No)->centro;
             (*No)->centro = filho;
 
         }else{
-            (*No)->info_4 = (*No)->info_3;
-            (*No)->info_3 = (*No)->info_2;
-            (*No)->info_2 = (*No)->info_1;
-            (*No)->info_1 = info;
+            (*No)->info4 = (*No)->info3;
+            (*No)->info3 = (*No)->info2;
+            (*No)->info2 = (*No)->info1;
+            (*No)->info1 = info;
 
             (*No)->dir = (*No)->centro_dir;
             (*No)->centro_dir = (*No)->centro;
@@ -110,77 +181,72 @@ void adicionaNo(Arv23 **No, int info, Arv23 *filho){
     }
 }
 
-Arv23 *quebraNo(Arv23 **raiz, int info, int *sobe, Arv23 *filho){
-    Arv23 *maiorNo;
+Arv45 *quebraNo(Arv45 **raiz, Info *info, Info **sobe, Arv45 *filho){
+    Arv45 *maiorNo;
 
-    if(info > (*raiz)->info_4){
-        *sobe = (*raiz)->info_3;
+    if(info->cod > (*raiz)->info4->cod){
+        *sobe = (*raiz)->info3;
 
-        maiorNo = criaNo((*raiz)->info_4, (*raiz)->centro_dir, (*raiz)->dir);
+        maiorNo = criaNo((*raiz)->info4, (*raiz)->centro_dir, (*raiz)->dir);
         
-        maiorNo->info_2 = info;
+        maiorNo->info2 = info;
 
         maiorNo->centro = filho;
 
         maiorNo->qtdInfo = 2;
 
-    } else if(info > (*raiz)->info_3){
-        *sobe = (*raiz)->info_3;
+    } else if(info->cod > (*raiz)->info3->cod){
+        *sobe = (*raiz)->info3;
 
         maiorNo = criaNo(info, (*raiz)->centro_dir, filho);
         
-        maiorNo->info_2 = (*raiz)->info_4;
+        maiorNo->info2 = (*raiz)->info4;
 
         maiorNo->centro = (*raiz)->dir;
 
         maiorNo->qtdInfo = 2;
 
-    }else if(info > (*raiz)->info_2){
+    }else if(info->cod > (*raiz)->info2->cod){
         *sobe = info;
         
-        maiorNo = criaNo((*raiz)->info_3, (*raiz)->centro, (*raiz)->centro_dir);
+        maiorNo = criaNo((*raiz)->info3, (*raiz)->centro, (*raiz)->centro_dir);
         
-        maiorNo->info_2 = (*raiz)->info_4;
+        maiorNo->info2 = (*raiz)->info4;
 
         maiorNo->centro = (*raiz)->dir;
 
         maiorNo->qtdInfo = 2;
 
-    }else if(info > (*raiz)->info_1){
-        *sobe = (*raiz)->info_2;
-        // if(info == 126)
-        //     printf("Eh igual 126\n");
-        maiorNo = criaNo((*raiz)->info_3, (*raiz)->centro, (*raiz)->centro_dir);
+    }else if(info->cod > (*raiz)->info1->cod){
+        *sobe = (*raiz)->info2;
+
+        maiorNo = criaNo((*raiz)->info3, (*raiz)->centro, (*raiz)->centro_dir);
         
-        maiorNo->info_2 = (*raiz)->info_4;
-        // printf("Valor: %d\n", (*raiz)->centro->info_1);
+        maiorNo->info2 = (*raiz)->info4;
 
         maiorNo->centro = (*raiz)->dir;
 
         maiorNo->qtdInfo = 2;
 
-        (*raiz)->info_2 = info;
+        (*raiz)->info2 = info;
         (*raiz)->centro = filho;
 
     }else{
-        *sobe = (*raiz)->info_2;
+        *sobe = (*raiz)->info2;
 
-        maiorNo = criaNo((*raiz)->info_3, (*raiz)->centro, (*raiz)->centro_dir);
+        maiorNo = criaNo((*raiz)->info3, (*raiz)->centro, (*raiz)->centro_dir);
         
-        // printf("Info3: %d, Info4: %d\n", (*raiz)->info_3, (*raiz)->info_4);
-        maiorNo->info_2 = (*raiz)->info_4;
-        // printf("Maior1: %d, Maior2: %d\n", maiorNo->info_1, maiorNo->info_2);
+        maiorNo->info2 = (*raiz)->info4;
 
         maiorNo->centro = (*raiz)->dir;
 
         maiorNo->qtdInfo = 2;
 
-        (*raiz)->info_2 = (*raiz)->info_1;
+        (*raiz)->info2 = (*raiz)->info1;
         (*raiz)->centro = (*raiz)->centro_esq;
         
-        (*raiz)->info_1 = info;
+        (*raiz)->info1 = info;
         (*raiz)->centro_esq = filho;
-        // printf("Info3: %d, Info4: %d\n", (*raiz)->info_3, (*raiz)->info_4);
 
     }
 
@@ -192,19 +258,18 @@ Arv23 *quebraNo(Arv23 **raiz, int info, int *sobe, Arv23 *filho){
     
 }
 
-Arv23 *insere23(Arv23 **raiz, int info, Arv23 *pai, int *sobe){
-    Arv23 *maiorNO;
-    // maiorNO = NULL;
+Arv45 *insere45(Arv45 **raiz, Arv45 *pai, Info **sobe, int cod, int tam, int qtd, int linha, char *tipo, char *marca, float preco){
+    Arv45 *maiorNO;
 
     if(*raiz == NULL){
-        *raiz = criaNo(info, NULL, NULL);
+        *raiz = criaNo(criaInfo(cod, tam, qtd, linha, tipo, marca, preco), NULL, NULL);
     }else{
         if(folha(*raiz)){
             if((*raiz)->qtdInfo < 4){
-                adicionaNo(raiz, info, NULL);
+                adicionaNo(raiz, criaInfo(cod, tam, qtd, linha, tipo, marca, preco), NULL);
                 maiorNO = NULL;
             }else{
-                maiorNO = quebraNo(raiz, info, sobe, NULL);
+                maiorNO = quebraNo(raiz, criaInfo(cod, tam, qtd, linha, tipo, marca, preco), sobe, NULL);
 
                 if(pai == NULL){
                     *raiz = criaNo(*sobe, *raiz, maiorNO);
@@ -212,36 +277,28 @@ Arv23 *insere23(Arv23 **raiz, int info, Arv23 *pai, int *sobe){
                 }
             }
         }else{
-            if(info < (*raiz)->info_1)
-                maiorNO = insere23(&((*raiz)->esq), info, *raiz, sobe);
+            if(cod < (*raiz)->info1->cod)
+                maiorNO = insere45(&((*raiz)->esq), *raiz, sobe, cod, tam, qtd, linha, tipo, marca, preco);
 
-            else if((*raiz)->qtdInfo == 1 || ((*raiz)->qtdInfo <= 4 && info < (*raiz)->info_2))
-                maiorNO = insere23(&((*raiz)->centro_esq), info, *raiz, sobe);
+            else if((*raiz)->qtdInfo == 1 || ((*raiz)->qtdInfo <= 4 && cod < (*raiz)->info2->cod))
+                maiorNO = insere45(&((*raiz)->centro_esq), *raiz, sobe, cod, tam, qtd, linha, tipo, marca, preco);
 
-            // else if((info > (*raiz)->info_2 && (*raiz)->qtdInfo == 2)  || ((*raiz)->qtdInfo == 3 && info < (*raiz)->info_3))
-            else if(((*raiz)->qtdInfo == 2)  || ((*raiz)->qtdInfo <= 4 && info < (*raiz)->info_3))
-                maiorNO = insere23(&((*raiz)->centro), info, *raiz, sobe);
+            else if(((*raiz)->qtdInfo == 2)  || ((*raiz)->qtdInfo <= 4 && cod < (*raiz)->info3->cod))
+                maiorNO = insere45(&((*raiz)->centro), *raiz,  sobe, cod, tam, qtd, linha, tipo, marca, preco);
 
-            // else if((*raiz)->qtdInfo == 2 || ((*raiz)->qtdInfo == 3 && info < (*raiz)->info_3))
-            //     maiorNO = insere23(&((*raiz)->centro), info, *raiz, sobe);
-
-            // else if((info > (*raiz)->info_3 && (*raiz)->qtdInfo == 3) || ((*raiz)->qtdInfo == 4 && info < (*raiz)->info_4))
-            else if(((*raiz)->qtdInfo == 3) || ((*raiz)->qtdInfo == 4 && info < (*raiz)->info_4))
-                maiorNO = insere23(&((*raiz)->centro_dir), info, *raiz, sobe);
-
-            // else if(((*raiz)->qtdInfo == 4 && info < (*raiz)->info_2))
-            //     maiorNO = insere23(&((*raiz)->centro_esq), info, *raiz, sobe);
+            else if(((*raiz)->qtdInfo == 3) || ((*raiz)->qtdInfo == 4 && cod < (*raiz)->info4->cod))
+                maiorNO = insere45(&((*raiz)->centro_dir), *raiz, sobe, cod, tam, qtd, linha, tipo, marca, preco);
 
             else 
-                maiorNO =insere23(&((*raiz)->dir), info, *raiz, sobe);
+                maiorNO = insere45(&((*raiz)->dir), *raiz, sobe, cod, tam, qtd, linha, tipo, marca, preco);
 
             if(maiorNO){
                 if((*raiz)->qtdInfo < 4){
                     adicionaNo(raiz, *sobe, maiorNO);
                     maiorNO = NULL;
                 }else{
-                    maiorNO = quebraNo(raiz, *sobe, sobe, maiorNO);
-                    // printf("Maior1: %d, Maior2: %d\n", maiorNO->info_1, maiorNO->info_2);
+                    maiorNO = quebraNo(raiz, criaInfo(cod, tam, qtd, linha, tipo, marca, preco), sobe, maiorNO);
+
                     if(pai == NULL){
                         *raiz = criaNo(*sobe, *raiz, maiorNO);
                         maiorNO = NULL;
@@ -253,15 +310,15 @@ Arv23 *insere23(Arv23 **raiz, int info, Arv23 *pai, int *sobe){
     return maiorNO;
 }
 
-// void mostrar(Arv23 *Raiz) {
+// void mostrar(Arv45 *Raiz) {
 //     if (Raiz != NULL) {
-//         printf("%d ", Raiz->info_1);
+//         printf("%d ", Raiz->info1);
 //         if(Raiz->qtdInfo == 2 || Raiz->qtdInfo > 2)
-//             printf("%d ", Raiz->info_2);
+//             printf("%d ", Raiz->info2);
 //         if(Raiz->qtdInfo == 3 || Raiz->qtdInfo > 3)
-//             printf("%d ", Raiz->info_3);
+//             printf("%d ", Raiz->info3);
 //         if(Raiz->qtdInfo == 4)
-//             printf("%d ", Raiz->info_4);
+//             printf("%d ", Raiz->info4);
 //         printf("Quantidade de Info: %d\n", Raiz->qtdInfo);
 
 //         mostrar(Raiz->esq);
@@ -272,66 +329,71 @@ Arv23 *insere23(Arv23 **raiz, int info, Arv23 *pai, int *sobe){
 //     }
 // }
 
-void mostrar(Arv23* Raiz, int nivel) {
-    if (Raiz != NULL) {
-        // mostrar(Raiz->centro_dir, nivel + 1);
+void exibirInfo(Info *info){
+    printf("cod: %d, tam: %d, qtd: %d, linha: %d, tipo: %s, marca: %s, preco: %.2f\n", info->cod, info->tam, info->qtd, info->linha, info->tipo, info->marca, info->preco);
+}
+
+void mostrar(Arv45* raiz, int nivel) {
+    if (raiz != NULL) {
+        // mostrar(raiz->centro_dir, nivel + 1);
 
         for (int i = 0; i < nivel; i++)
             printf("   ");
 
-        printf("%d ", Raiz->info_1);
-        if (Raiz->qtdInfo == 2 || Raiz->qtdInfo > 2)
-            printf("%d ", Raiz->info_2);
-        if (Raiz->qtdInfo == 3 || Raiz->qtdInfo > 3)
-            printf("%d ", Raiz->info_3);
-        if (Raiz->qtdInfo == 4)
-            printf("%d ", Raiz->info_4);
-        printf("Quantidade de Info: %d\n", Raiz->qtdInfo);
+        // printf("%d ", raiz->info1->cod);
+        exibirInfo(raiz->info1);
+        if (raiz->qtdInfo == 2 || raiz->qtdInfo > 2)
+            exibirInfo(raiz->info2);
+        if (raiz->qtdInfo == 3 || raiz->qtdInfo > 3)
+            exibirInfo(raiz->info3);
+        if (raiz->qtdInfo == 4)
+            exibirInfo(raiz->info4);
+        printf("Quantidade de Info: %d\n", raiz->qtdInfo);
 
-        mostrar(Raiz->esq, nivel + 1);
-        mostrar(Raiz->centro_esq, nivel + 1);
-        mostrar(Raiz->centro, nivel + 1);
-         mostrar(Raiz->centro_dir, nivel + 1); // Impresso acima para melhor visualização
-        mostrar(Raiz->dir, nivel + 1);
+        mostrar(raiz->esq, nivel + 1);
+        mostrar(raiz->centro_esq, nivel + 1);
+        mostrar(raiz->centro, nivel + 1);
+        mostrar(raiz->centro_dir, nivel + 1); // Impresso acima para melhor visualização
+        mostrar(raiz->dir, nivel + 1);
     }
 }
 
 int main(){
-    Arv23 *Raiz = NULL;
-    int sobe; 
-
+    Arv45 *raiz = NULL;
+    Info *sobe; 
+    lerArquivo(&raiz, &sobe);
     // insere23(&Raiz, 400, NULL, &sobe);
-    insere23(&Raiz, 721, NULL, &sobe);
-    insere23(&Raiz, 670, NULL, &sobe);
-    insere23(&Raiz, 570, NULL, &sobe);
-    insere23(&Raiz, 922, NULL, &sobe);
-    insere23(&Raiz, 130, NULL, &sobe);
-    insere23(&Raiz, 345, NULL, &sobe);
-    insere23(&Raiz, 797, NULL, &sobe);
-    insere23(&Raiz, 385, NULL, &sobe);
-    insere23(&Raiz, 874, NULL, &sobe);
-    insere23(&Raiz, 405, NULL, &sobe);
-    insere23(&Raiz, 652, NULL, &sobe);
-    insere23(&Raiz, 491, NULL, &sobe);
-    insere23(&Raiz, 830, NULL, &sobe);
-    insere23(&Raiz, 443, NULL, &sobe);
-    insere23(&Raiz, 105, NULL, &sobe);
-    insere23(&Raiz, 285, NULL, &sobe);
-    insere23(&Raiz, 126, NULL, &sobe);
-    insere23(&Raiz, 556, NULL, &sobe);
-    insere23(&Raiz, 795, NULL, &sobe);
-    insere23(&Raiz, 899, NULL, &sobe);
+    // insere23(&Raiz, 721, NULL, &sobe);
+    // insere23(&Raiz, 670, NULL, &sobe);
+    // insere23(&Raiz, 570, NULL, &sobe);
+    // insere23(&Raiz, 922, NULL, &sobe);
+    // insere23(&Raiz, 130, NULL, &sobe);
+    // insere23(&Raiz, 345, NULL, &sobe);
+    // insere23(&Raiz, 797, NULL, &sobe);
+    // insere23(&Raiz, 385, NULL, &sobe);
+    // insere23(&Raiz, 874, NULL, &sobe);
+    // insere23(&Raiz, 405, NULL, &sobe);
+    // insere23(&Raiz, 652, NULL, &sobe);
+    // insere23(&Raiz, 491, NULL, &sobe);
+    // insere23(&Raiz, 830, NULL, &sobe);
+    // insere23(&Raiz, 443, NULL, &sobe);
+    // insere23(&Raiz, 105, NULL, &sobe);
+    // insere23(&Raiz, 285, NULL, &sobe);
+    // insere23(&Raiz, 126, NULL, &sobe);
+    // insere23(&Raiz, 556, NULL, &sobe);
+    // insere23(&Raiz, 795, NULL, &sobe);
+    // insere23(&Raiz, 899, NULL, &sobe);
     
-    insere23(&Raiz, 502, NULL, &sobe);
-    insere23(&Raiz, 866, NULL, &sobe);
-    insere23(&Raiz, 725, NULL, &sobe);
-    insere23(&Raiz, 581, NULL, &sobe);
-    insere23(&Raiz, 408, NULL, &sobe);
-    insere23(&Raiz, 348, NULL, &sobe);
-    insere23(&Raiz, 575, NULL, &sobe);
-    insere23(&Raiz, 719, NULL, &sobe);
-    insere23(&Raiz, 983, NULL, &sobe);
-    insere23(&Raiz, 63, NULL, &sobe);
+    // insere23(&Raiz, 502, NULL, &sobe);
+    // insere23(&Raiz, 866, NULL, &sobe);
+    // insere23(&Raiz, 725, NULL, &sobe);
+    // insere23(&Raiz, 581, NULL, &sobe);
+    // insere23(&Raiz, 408, NULL, &sobe);
+    // insere23(&Raiz, 348, NULL, &sobe);
+    // insere23(&Raiz, 575, NULL, &sobe);
+    // insere23(&Raiz, 719, NULL, &sobe);
+    // insere23(&Raiz, 983, NULL, &sobe);
+    // insere23(&Raiz, 63, NULL, &sobe);
 
     // insere23(&Raiz, 10, NULL, &sobe);
     // insere23(&Raiz, 11, NULL, &sobe);
@@ -362,7 +424,7 @@ int main(){
     // insere23(&Raiz, 470, NULL, &sobe);
     // insere23(&Raiz, 490, NULL, &sobe);
 
-    mostrar(Raiz, 0);
+    mostrar(raiz, 0);
 
     return 0;    
 }
