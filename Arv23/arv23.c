@@ -373,7 +373,7 @@ void Redistribui(Arv23 **raiz, Arv23 **pai) {
             if (pai != NULL) {
                 if ((*raiz) == ((*pai)->dir)) {
                     if ((*pai)->centro->numInfo == 2) {
-                        (*raiz)->info1 = (*pai)->info1;
+                        (*raiz)->info1 = (*pai)->info2;
                         (*raiz)->numInfo = 1;
                         (*pai)->info2 = (*pai)->centro->info2;
                         (*pai)->centro->numInfo = 1;
@@ -475,10 +475,10 @@ void Redistribui(Arv23 **raiz, Arv23 **pai) {
             else if (pai == NULL) {
                 (*raiz) = (*raiz)->centro;
             }
-            else if (folha(*raiz) == 0 && pai == NULL){
-                free(*raiz);
-                *raiz = NULL;
-            }    
+            // else if (folha(*raiz) == 0 && pai == NULL){
+            //     free(*raiz);
+            //     *raiz = NULL;
+            // }    
         }
 }
 

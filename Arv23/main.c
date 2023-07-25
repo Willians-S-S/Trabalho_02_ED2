@@ -30,7 +30,7 @@ void lerPath(Arv23 **raiz, char path[], int inseriu[]){
     //         }
     //     }
         
-        lerArquivo("texto.txt", raiz, inseriu);
+        lerArquivo("arquivo.txt", raiz, inseriu);
 
         memset(inseriu, 0, sizeof(100));
     // }
@@ -48,11 +48,11 @@ int main(){
     lerPath(&raiz, path, inseriu);
     
     // imprimirArv(raiz);
-    remover23(NULL, &raiz, "texto");
-    remover23(NULL, &raiz, "na");
-    remover23(NULL, &raiz, "baixo");
-    remover23(NULL, &raiz, "a");
-    remover23(NULL, &raiz, "cima");
+    // remover23(NULL, &raiz, "texto");
+    // remover23(NULL, &raiz, "na");
+    // remover23(NULL, &raiz, "baixo");
+    // remover23(NULL, &raiz, "a");
+    // remover23(NULL, &raiz, "cima");
 
     auxiliaInsere(&raiz, "opa", 2, NULL, &infoSobe);
 
