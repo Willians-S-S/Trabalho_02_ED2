@@ -13,7 +13,7 @@ void lerArquivo(char *path, Arv23 **raiz, int inseriu[]){
         printf("Erro ao abrir o arquivo.");
     }
 
-    char frase[100], *palavra;
+    char frase[5000], *palavra;
 
     int linha = 1;
 
@@ -22,6 +22,7 @@ void lerArquivo(char *path, Arv23 **raiz, int inseriu[]){
 
         while (palavra != NULL){
             palavra[strcspn(palavra, "\n")] = '\0'; // strcspn(palavra, "\n") encontra a primeira posição de \n. e substtui por \0
+            palavra[strcspn(palavra, ".")] = '\0';
             // Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe)
             // printf("%s\n",palavra);
             auxiliaInsere(raiz, palavra, linha, NULL, &aux);
@@ -29,6 +30,7 @@ void lerArquivo(char *path, Arv23 **raiz, int inseriu[]){
             // imprimirArv(*raiz);
             palavra = strtok(NULL, " ");
         }
+        printf("%d\n", linha);
         linha += 1;
     }
 
@@ -240,10 +242,8 @@ void auxiliaInsere(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **in
     buscaPalavra(*raiz, palavra, &aux);
 
     if(aux == NULL){
-        printf("Eh null\n");
         inserePalavra(raiz, palavra, linha, NULL, infoSobe);
     }else{
-        printf("Nao Eh null\n");
         inserirLinha(&(aux->ListaNum), linha);
     }
 }
