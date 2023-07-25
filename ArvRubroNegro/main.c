@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "rubroNegro.h"
+#include "imprimir.h"
 
 void lerPath(Rubro **raiz, char path[], int inseriu[]){
 
@@ -119,7 +120,7 @@ void imprimirPalavra(Rubro *raiz, char palavra[], int inseriu[]){
             imprimeNo(aux);
         else
             printf("\nPalavra não encontrada\n");
-        memset(inseriu, 0, sizeof(inseriu));
+        memset(inseriu, 0, 4);
     }
 }
 
@@ -161,23 +162,34 @@ int main(){
                 imprimirPalavra(raiz, palavra, inseriu);
                 break;
             case 5:
+                int flag;
+
                 printf("\nDigite a palavra: ");
                 scanf(" %s", palavra);
                 printf("Digite a linha da palavra: ");
                 scanf("%d", &linha);
-                auxRemover(&raiz, palavra, linha, inseriu);
 
-                if(inseriu[0] == 0)
+                // 200 -> removeu a palavra e a linha
+                // 210 -> removeu somente a linha
+                // 300 -> encontrou a palavra, mas não a linha
+                // 400 -> não encontrou a palavra
+                // 500 -> não removeu a linha
+                // 510 -> não removeu a palavra
+
+                flag = auxRemover(&raiz, palavra, linha, inseriu);
+
+                if(flag == 400)
                     printf("\nPalavra não encontrada\n");
                 else{
-
-                    if(inseriu[1] == 0)
+                    if(flag == 300)
                         printf("\nPalavra encontrada, mas a linha informada não.\n");
-                    else if(inseriu[2] == 0 && inseriu[3] == 0)
-                        printf("\nNão foi possivel remover a palavra e a linha informada\n");
-                    else if(inseriu[2] == 1 && inseriu[3] == 1)
+                    else if(flag == 510)
+                        printf("\nNão foi possivel remover a palavra\n");
+                    else if(flag == 500)
+                        printf("\nNão foi possivel remover a linha\n");
+                    else if(flag == 200)
                         printf("\nPalavra e linha foram removidas.\n");
-                    else if(inseriu[2] == 1)
+                    else if(flag == 210)
                         printf("A palavra foi removida da linha %d.\n", linha);
                         
                 }
