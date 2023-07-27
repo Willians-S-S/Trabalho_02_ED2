@@ -3,37 +3,32 @@
 #include <stdlib.h>
 #include "arv23.h"
 
-void lerArquivo(char *path, Arv23 **raiz, int inseriu[]){
+void lerArquivo(char *path, Arv23 **raiz, char *resultado){
     FILE *arquivo;
     arquivo = fopen(path, "r");
-    Info *aux;
-    aux = NULL;
-
+    
     if(arquivo == NULL){
-        printf("Erro ao abrir o arquivo.");
-    }
+        strcpy(resultado, "Erro ao abrir o arquivo.\n");
+    }else{
+        Info *aux;
+        aux = NULL;
+        char frase[5000], *palavra, resu[100];
+        int linha = 1;
 
-    char frase[5000], *palavra;
+        while(fgets(frase, sizeof(frase), arquivo) != NULL){
+            palavra = strtok(frase, " ");
 
-    int linha = 1;
-
-    while(fgets(frase, sizeof(frase), arquivo) != NULL){
-        palavra = strtok(frase, " ");
-
-        while (palavra != NULL){
-            palavra[strcspn(palavra, "\n")] = '\0'; // strcspn(palavra, "\n") encontra a primeira posição de \n. e substtui por \0
-            palavra[strcspn(palavra, ".")] = '\0';
-            // Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe)
-            // printf("%s\n",palavra);
-            auxiliaInsere(raiz, palavra, linha, NULL, &aux);
-            // printf("Vez %d\n", linha);
-            // imprimirArv(*raiz);
-            palavra = strtok(NULL, " ");
+            while (palavra != NULL){
+                palavra[strcspn(palavra, "\n")] = '\0'; // strcspn(palavra, "\n") encontra a primeira posição de \n. e substtui por \0
+                palavra[strcspn(palavra, ".")] = '\0';
+                auxiliaInsere(raiz, palavra, linha, NULL, &aux, resu);
+                palavra = strtok(NULL, " ");
+            }
+            linha += 1;
         }
-        printf("%d\n", linha);
-        linha += 1;
+        strcpy(resultado, "Arquivo lido com sucesso.\n");
+        fclose(arquivo);
     }
-
 }
 
 // cria nó deve receber a palavra, ponteiro para lista, se esse ponteiro for nulo, deve-se criar a lista, pelo parametro linha, caso o ponteiro 
@@ -174,7 +169,6 @@ Arv23 *quebraNo(Arv23 **raiz, Arv23 *filho, Info *info, Info **infoSobe) {
 
     (*raiz)->numInfo = 1;
     (*raiz)->info2 = NULL;
-    // strcpy((*raiz)->info2->palavra, "Chega");
     (*raiz)->dir = NULL; 
 
     return maiorNo;
@@ -189,17 +183,19 @@ int folha(Arv23 *raiz){
     return flag;
 }
 
-Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe){
+Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe, int *flag){
     Arv23 *maiorNo;
 
     if(*raiz == NULL){ 
         *raiz = criaNo(criaInfo(palavra, NULL, linha), NULL, NULL);
+        *flag = 1;
     }else{
 
         if(folha(*raiz)){
             if((*raiz)->numInfo == 1){
                 adicionaNo(raiz, criaInfo(palavra, NULL, linha), NULL);
                 maiorNo = NULL;
+                *flag = 1;
             }else{
                 maiorNo = quebraNo(raiz, NULL, criaInfo(palavra, NULL, linha), infoSobe);
 
@@ -207,17 +203,18 @@ Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **
                     *raiz = criaNo(*infoSobe, *raiz, maiorNo);
                     maiorNo = NULL;
                 }
+                *flag = 1;
             }
         }else{
             
             if(strcmp(palavra, (*raiz)->info1->palavra) < 0)   
-                maiorNo = inserePalavra(&((*raiz)->esq), palavra, linha, *raiz, infoSobe);
+                maiorNo = inserePalavra(&((*raiz)->esq), palavra, linha, *raiz, infoSobe, flag);
             
             else if(((*raiz)->numInfo == 1) || ((*raiz)->numInfo == 2 && strcmp(palavra, (*raiz)->info2->palavra) < 0))
-                maiorNo = inserePalavra(&((*raiz)->centro), palavra, linha, *raiz, infoSobe);
+                maiorNo = inserePalavra(&((*raiz)->centro), palavra, linha, *raiz, infoSobe, flag);
             
             else
-                maiorNo = inserePalavra(&((*raiz)->dir), palavra, linha, *raiz, infoSobe);   
+                maiorNo = inserePalavra(&((*raiz)->dir), palavra, linha, *raiz, infoSobe, flag);   
 
             if(maiorNo != NULL){
                 if((*raiz)->numInfo == 1){
@@ -236,15 +233,22 @@ Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **
     return maiorNo;
 }
 
-void auxiliaInsere(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe){
+void auxiliaInsere(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe, char *resultado){
     Info *aux;
     aux = NULL;
+    int flag = 0;
+
     buscaPalavra(*raiz, palavra, &aux);
 
     if(aux == NULL){
-        inserePalavra(raiz, palavra, linha, NULL, infoSobe);
+        inserePalavra(raiz, palavra, linha, NULL, infoSobe, &flag);
+        if(flag == 1)
+            strcpy(resultado, "Palavra inserida com sucesso.\n");
+        else
+            strcpy(resultado, "Nao foi possivel inserir palavra.\n");
     }else{
         inserirLinha(&(aux->ListaNum), linha);
+        strcpy(resultado, "Palavra ja existe na arvore, foi inserida na linha.\n");
     }
 }
 
@@ -266,14 +270,17 @@ void imprimirInfo(Info *info){
 
 void imprimirArv(Arv23 *raiz){
     if(raiz != NULL){
+        imprimirArv(raiz->esq);
+
         printf("\nInfo 1:\n");
+
         imprimirInfo(raiz->info1);
+        
+        imprimirArv(raiz->centro);
         if(raiz->numInfo == 2){
             printf("Info 2:\n");
             imprimirInfo(raiz->info2);
         }
-        imprimirArv(raiz->esq);
-        imprimirArv(raiz->centro);
         imprimirArv(raiz->dir);
     }
 }
@@ -281,8 +288,6 @@ void imprimirArv(Arv23 *raiz){
 // busca
 
 Info *buscaPalavra(Arv23 *raiz, char *palavra, Info **aux){
-    // Info *aux;
-    // aux = NULL;
 
     if(raiz != NULL){
         if(strcmp(palavra, raiz->info1->palavra) == 0)
@@ -290,7 +295,6 @@ Info *buscaPalavra(Arv23 *raiz, char *palavra, Info **aux){
         if(raiz->numInfo == 2){
             if(strcmp(palavra, raiz->info2->palavra) == 0)
                 *aux = raiz->info2;
-        
         }
         
         if(strcmp(palavra, raiz->info1->palavra) < 0)   
@@ -302,27 +306,57 @@ Info *buscaPalavra(Arv23 *raiz, char *palavra, Info **aux){
         else
             buscaPalavra(raiz->dir, palavra, aux);
     }
-    // if(raiz != NULL){
-    //     if(strcmp(palavra, raiz->info1->palavra) == 0)
-    //         return raiz->info1;
-    //     if(raiz->numInfo == 2){
-    //         if(strcmp(palavra, raiz->info2->palavra) == 0)
-    //             return raiz->info2;
-    //     }
-    //     imprimirArv(raiz->esq);
-    //     imprimirArv(raiz->centro);
-    //     imprimirArv(raiz->dir);
-    // }
-    // return aux;
 }
 
 // Remover
+
+Linhas removeLinha(Linhas **no, int linha, int *flag){
+    if((*no) != NULL){
+        if((*no)->linha == linha){
+            Linhas *aux;
+            aux = *no;
+            *no = (*no)->prox;
+            free(aux);
+            *flag = 1;
+        }else
+            removeLinha(&((*no)->prox), linha, flag);
+    }
+}
+
+void auxRemover(Arv23 **raiz, char *palavra, int linha, char *resultado){
+    if(raiz != NULL){
+        Info *aux;
+        aux = NULL;
+
+        buscaPalavra(*raiz, palavra, &aux);
+
+        if(aux != NULL){
+            int flag = 0;
+            if(aux->ListaNum != NULL)
+                printf("Liida\n");
+                removeLinha(&(aux->ListaNum), linha, &flag);
+            
+            if(flag == 1){
+                if(aux->ListaNum == NULL){
+                    remover23(NULL, raiz, palavra);
+                    strcpy(resultado, "Palavra removida.\n");
+                }else
+                    strcpy(resultado, "A palavra foi removida somente da linha\n");
+            }else{
+                strcpy(resultado, "Linha informada nao foi removida, pois nao foi encontrada.\n");
+            }
+        }else{
+            strcpy(resultado, "Palavra não encontrada\n");
+        }
+    }
+}
+
 
 void MaiorInfoRemoveEsq(Arv23 **raiz, Arv23** PaiMaior, Arv23** MaiorInfoRemove, int LocalInfo) {
     if (MaiorInfoRemove != NULL) {
         if ((*MaiorInfoRemove)->esq == NULL) {
             char *aux;
-            // aux = NULL;
+
             aux = (char *) malloc(sizeof(char) * 50);
             strcpy(aux, "NOT FOUND");
 
@@ -474,11 +508,7 @@ void Redistribui(Arv23 **raiz, Arv23 **pai) {
             }
             else if (pai == NULL) {
                 (*raiz) = (*raiz)->centro;
-            }
-            // else if (folha(*raiz) == 0 && pai == NULL){
-            //     free(*raiz);
-            //     *raiz = NULL;
-            // }    
+            }   
         }
 }
 

@@ -25,7 +25,7 @@ struct  Arv23 {
 
 Arv23 *criaNo(Info *info, Arv23 *noEsq, Arv23 *noCentro);
 
-void lerArquivo(char *path, Arv23 **raiz, int inseriu[]);
+void lerArquivo(char *path, Arv23 **raiz, char *resultado);
 
 Info *criaInfo(char *palavra, Linhas *lista, int linha);
 
@@ -36,9 +36,9 @@ void inserirLinha(Linhas **no, int linha);
 
 Arv23 *quebraNo(Arv23 **Raiz, Arv23 *filho, Info *info, Info **infoSobe);
 
-Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe);
+Arv23 *inserePalavra(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe, int *flag);
 
-void auxiliaInsere(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe);
+void auxiliaInsere(Arv23 **raiz, char *palavra, int linha, Arv23 *pai, Info **infoSobe, char *resultado);
 
 // imprimir
 void imprimirLista(Linhas *no);
@@ -51,6 +51,8 @@ void imprimirArv(Arv23 *raiz);
 Info *buscaPalavra(Arv23 *raiz, char *palavra, Info **aux);
 
 // Remover
+Linhas removeLinha(Linhas **no, int linha, int *flag);
+void auxRemover(Arv23 **raiz, char *palavra, int linha, char *resultado);
 void MaiorInfoRemoveEsq(Arv23 **raiz, Arv23** PaiMaior, Arv23** MaiorInfoRemove, int LocalInfo);
 void Redistribui(Arv23 **raiz, Arv23 **pai);
 void remover23(Arv23 **pai, Arv23 **raiz, char *palavra);
