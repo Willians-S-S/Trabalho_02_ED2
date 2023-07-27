@@ -24,6 +24,7 @@ struct Rubro{
     Rubro *esq, *dir;
 };
 
+Rubro *buscarPalavra1(Rubro *raiz, char *palavra, int achou[]);
 
 void lerArquivo(char *nomeArquivo, Rubro **raiz, int inseriu[]);
 

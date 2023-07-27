@@ -39,7 +39,6 @@ void lerArquivo(Arv45 **raiz, Info **sobe){
         // Ler cada linha do arquivo até o final
         while (fscanf(arquivo, "%d %d %d %s %s %f\n", &cod, &tam, &qtd, tipo, marca, &preco) == 6) {
             insere45(raiz, NULL, sobe, cod, tam, qtd, linha, tipo, marca, preco, &flag);
-
             if(flag == 0) 
                 printf("Esse codigo nao foi inserido: %d\n", cod);
             flag = 0;
@@ -311,7 +310,8 @@ Arv45 *insere45(Arv45 **raiz, Arv45 *pai, Info **sobe, int cod, int tam, int qtd
 }
 
 void exibirInfo(Info *info){
-        printf("cod: %d, tam: %d, qtd: %d, linha: %d, tipo: %s, marca: %s, preco: %.2f\n", info->cod, info->tam, info->qtd, info->linha, info->tipo, info->marca, info->preco);
+        // printf("cod: %d, tam: %d, qtd: %d, linha: %d, tipo: %s, marca: %s, preco: %.2f\n", info->cod, info->tam, info->qtd, info->linha, info->tipo, info->marca, info->preco);
+        printf("cod: %d ", info->cod);
 }
 
 void mostrar(Arv45* raiz, int nivel) {
@@ -372,6 +372,36 @@ void mostrar(Arv45* raiz, int nivel) {
 //     }
 // }
 
+// Info *buscarProduto(Arv45 *raiz, int cod){
+//     Info *achou = NULL;
+
+//     if(raiz){
+//         if(cod == raiz->info1->cod)
+//             achou = raiz->info1;
+//         if(raiz->qtdInfo >= 2 && raiz->info2 && cod == raiz->info2->cod)
+//             achou = raiz->info2;
+//         if(raiz->qtdInfo >= 3 && raiz->info3 && cod == raiz->info3->cod)
+//             achou = raiz->info3;
+//         if(raiz->qtdInfo >= 4 && raiz->info4 && cod == raiz->info4->cod)
+//             achou = raiz->info4;
+//         else{
+//             if(cod < raiz->info1->cod)
+//                 achou = buscarProduto(raiz->esq, cod);
+//             else if(raiz->qtdInfo == 1 || (raiz->qtdInfo <= 4 && (!raiz->info2 || cod < raiz->info2->cod)))
+//                 achou = buscarProduto(raiz->centro_esq, cod);
+//             else if((raiz->qtdInfo == 2)  || (raiz->qtdInfo <= 4 && (!raiz->info3 || cod < raiz->info3->cod)))
+//                 achou = buscarProduto(raiz->centro, cod);
+//             else if((raiz->qtdInfo == 3) || (raiz->qtdInfo == 4 && (!raiz->info4 || cod < raiz->info4->cod)))
+//                 achou = buscarProduto(raiz->centro_dir, cod);
+//             else 
+//                 achou = buscarProduto(raiz->dir, cod);
+//         }
+//     }
+//     return achou;
+// }
+
+
+
 Info *buscarProduto(Arv45 *raiz, int cod){
     Info *achou = NULL;
 
@@ -379,19 +409,22 @@ Info *buscarProduto(Arv45 *raiz, int cod){
         if(cod == raiz->info1->cod)
             achou = raiz->info1;
 
-        else if(raiz->qtdInfo == 2){
+        if(raiz->qtdInfo == 2){
             if(cod == raiz->info2->cod)
                 achou = raiz->info2;
 
-        }else if(raiz->qtdInfo == 3){
+        } 
+        if(raiz->qtdInfo == 3){
             if(cod == raiz->info3->cod)
                 achou = raiz->info3;
 
-        }else if(raiz->qtdInfo == 4){
+        }
+        if(raiz->qtdInfo == 4){
             if(cod == raiz->info4->cod)
                 achou = raiz->info4;
 
-        }else{
+        }
+        if(achou == NULL){
             if(cod < raiz->info1->cod)
                 achou = buscarProduto(raiz->esq, cod);
 
@@ -437,75 +470,48 @@ void atualizarArquivo(Info *no){
             fseek(arquivo, -1, SEEK_CUR); // Volta 1 caractere para sobrescrever a quebra de linha
             // codigo, tamanho, quantidade, tipo, marca, preco.
             fprintf(arquivo, "\n%d %d %d %s %s %.2f", no->cod, no->tam, no->qtd, no->tipo, no->marca, no->preco);
+            printf("Arquivo atualizado\n");
 
             fclose(arquivo);
         }
     }
 }
 
-void vender(Arv45 *raiz){
-    mostrar(raiz, 0);
-    int cod, qtd, opcompra;
+void vender(Arv45 *raiz, int qtd, int cod, char *resultado){
     Info *aux;
-
-    printf("Escolha o produto pelo código: ");
-    scanf("%d", &cod);
-    // digitou o codigo certo?
 
     aux = buscarProduto(raiz, cod);
 
     if(aux != NULL){
-        printf("Deseja comprar quantos calcados: ");
-        scanf("%d", &qtd);
 
-        if(qtd > aux->qtd && aux->qtd != 0){
-            printf("Estao disponiveis somente %d calcados. Deseja compra-los? 1 - sim / 2 - nao:  ", aux->qtd);
-            scanf("%d", &opcompra);
-            
-            if(opcompra == 1){
-                printf("Segundo if\n");
-                printf("O valor total eh: %.2f,  Deseja continua? 1 - sim / 2 - nao: ", aux->preco * aux->qtd);
-                scanf("%d", &opcompra);
-                
-                if(opcompra == 1){
-                    aux->qtd = 0;
-                    atualizarArquivo(aux);
-                    printf("Compra realizada com sucesso.\n");
-                }else if(opcompra == 2)
-                    printf("Compra nao efetuada.\n");
-                else
-                    printf("Codigo nao reconhecido refaca as operacoes.\n");
+        if(qtd > aux->qtd){
+            char str_numero[100];
+            // str_numero = itoa(aux->qtd);
+            snprintf(str_numero, sizeof(str_numero), "%d", aux->qtd);
 
-            }else if(opcompra == 2)
-                printf("Compra nao efetuada.\n");
-            else
-                printf("Codigo nao reconhecido refaca as operacoes.\n");
-        
+            strcpy(resultado, "Nao eh possivel comprar pois nao temos essa quantidade de produto. Estao disponiveis somente ");
+            strcat(resultado, str_numero);
+
+        }
+
+        else if(qtd > aux->qtd && aux->qtd != 0){
+            aux->qtd = 0;
+            atualizarArquivo(aux);
+            strcpy(resultado, "Compra realizada com sucesso.\n");
         }
         else if(qtd != 0 && aux->qtd != 0){
-
-            printf("O valor total eh: %.2f,  Deseja continua? 1 - sim / 2 - nao: ", aux->preco * qtd);
-            scanf("%d", &opcompra);
-            
-            if(opcompra == 1){
                 aux->qtd -= qtd;
                 atualizarArquivo(aux);
-                printf("Compra realizada com sucesso.\n");
-            }
-            else if(opcompra == 2)
-                printf("Compra nao efetuada.\n");
-            else
-                printf("Codigo nao reconhecido refaca as operacoes.\n");
+                strcpy(resultado, "Compra realizada com sucesso.\n");
         }
         else{
             if(qtd == 0)
-                printf("vc digitou 0, ou seja, nao eh possivel comprar\n");
+                strcpy(resultado, "vc digitou 0, ou seja, nao eh possivel comprar\n");
             else
-                printf("Nao eh possivel comprar pois o produto nao estar disponivel\n");
+                strcpy(resultado, "Nao eh possivel comprar pois o produto nao estar disponivel\n");
         }
-
     }else
-        printf("Produto nao encontrado.\n");
+        strcpy(resultado, "Produto nao encontrado.\n");
 }
 
 void reporProduto(Arv45 *raiz){
@@ -547,39 +553,26 @@ int quantidadeLinhas(){
     return qtdLinha;
 }
 
-void adicionarCalcados(Arv45 **raiz, Info **sobe){
+void adicionarCalcados(Arv45 **raiz, Info **sobe, int cod, int tam, int qtd, char *tipo, char *marca, float preco, char *resultado){
     FILE *arquivo;
 
     arquivo = fopen("loja.txt", "a");
 
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
+        strcpy(resultado, "Erro ao abrir o arquivo.\n");
     }else{
-        int cod, tam, qtd, flag = 0, qtdLinha = 1;
-        char tipo[100], marca[100], linha[250];
-        float preco;
-
-        printf("Digite o codigo do produto: ");
-        scanf("%d", &cod);
-        printf("Digite o tamanho do produto: ");
-        scanf("%d", &tam);
-        printf("Digite a quantida do produto: ");
-        scanf("%d", &qtd);
-        printf("Digite o tipo do produto: ");
-        scanf("%s", tipo);
-        printf("Digite o a marca do produto: ");
-        scanf("%s", marca);
-        printf("Digite o preco do produto: ");
-        scanf("%f", &preco);
-
+        int flag = 0, qtdLinha = 1;
         
         qtdLinha = quantidadeLinhas();
 
-
         insere45(raiz, NULL, sobe, cod, tam, qtd, qtdLinha, tipo, marca, preco, &flag);
 
-        if(flag == 1)
+        if(flag == 1){
             fprintf(arquivo, "\n%d %d %d %s %s %.2f", cod, tam, qtd, tipo, marca, preco);
+            strcpy(resultado, "O produto foi inserido com sucesso\n");
+        }else{
+            strcpy(resultado, "O produto não foi inserido\n");
+        }
         
         fclose(arquivo);
     }
@@ -588,78 +581,97 @@ void adicionarCalcados(Arv45 **raiz, Info **sobe){
 
 int main(){
     Arv45 *raiz = NULL;
-    Info *sobe; 
+    Info *sobe, *aux; 
+    aux = NULL;
+    char resultado[100], tipo[100], marca[100];
+    int op = -1, cod, qtd, opcompra, sinalization, tam;
+    float preco;
 
     lerArquivo(&raiz, &sobe);
-    mostrar(raiz, 0);
-    // atualizarArquivo();
-    // vender(raiz);
-    // reporProduto(raiz);
-    // adicionarCalcados(&raiz, &sobe);
 
-    // insere23(&Raiz, 400, NULL, &sobe);
-    // insere23(&Raiz, 721, NULL, &sobe);
-    // insere23(&Raiz, 670, NULL, &sobe);
-    // insere23(&Raiz, 570, NULL, &sobe);
-    // insere23(&Raiz, 922, NULL, &sobe);
-    // insere23(&Raiz, 130, NULL, &sobe);
-    // insere23(&Raiz, 345, NULL, &sobe);
-    // insere23(&Raiz, 797, NULL, &sobe);
-    // insere23(&Raiz, 385, NULL, &sobe);
-    // insere23(&Raiz, 874, NULL, &sobe);
-    // insere23(&Raiz, 405, NULL, &sobe);
-    // insere23(&Raiz, 652, NULL, &sobe);
-    // insere23(&Raiz, 491, NULL, &sobe);
-    // insere23(&Raiz, 830, NULL, &sobe);
-    // insere23(&Raiz, 443, NULL, &sobe);
-    // insere23(&Raiz, 105, NULL, &sobe);
-    // insere23(&Raiz, 285, NULL, &sobe);
-    // insere23(&Raiz, 126, NULL, &sobe);
-    // insere23(&Raiz, 556, NULL, &sobe);
-    // insere23(&Raiz, 795, NULL, &sobe);
-    // insere23(&Raiz, 899, NULL, &sobe);
-    
-    // insere23(&Raiz, 502, NULL, &sobe);
-    // insere23(&Raiz, 866, NULL, &sobe);
-    // insere23(&Raiz, 725, NULL, &sobe);
-    // insere23(&Raiz, 581, NULL, &sobe);
-    // insere23(&Raiz, 408, NULL, &sobe);
-    // insere23(&Raiz, 348, NULL, &sobe);
-    // insere23(&Raiz, 575, NULL, &sobe);
-    // insere23(&Raiz, 719, NULL, &sobe);
-    // insere23(&Raiz, 983, NULL, &sobe);
-    // insere23(&Raiz, 63, NULL, &sobe);
+    while (op != 0) {
+        printf("\n0 - Encerrar\n"
+               "1 - Imprimir arvore em ordem\n"
+               "2 - Buscar calcado\n"
+               "3 - Comprar calcado\n"
+               "4 - Adicionar calcado\n"
+               "Digite a opcao: ");
+        scanf("%d", &op);
 
-    // insere23(&Raiz, 10, NULL, &sobe);
-    // insere23(&Raiz, 11, NULL, &sobe);
-    // insere23(&Raiz, 1, NULL, &sobe);
-    // insere23(&Raiz, 2, NULL, &sobe);
-    // insere23(&Raiz, 3, NULL, &sobe);
-    // insere23(&Raiz, 4, NULL, &sobe);
-    // insere23(&Raiz, 5, NULL, &sobe);
-    // insere23(&Raiz, 6, NULL, &sobe);
-    // insere23(&Raiz, 7, NULL, &sobe);
-    // insere23(&Raiz, 8, NULL, &sobe);
-    // insere23(&Raiz, 9, NULL, &sobe);
-    // insere23(&Raiz, 10, NULL, &sobe);
-    // insere23(&Raiz, 11, NULL, &sobe);
-    // insere23(&Raiz, 900, NULL, &sobe);
-    // insere23(&Raiz, 1000,NULL, &sobe);
-    // insere23(&Raiz, 600, NULL, &sobe);
-    // insere23(&Raiz, 1300,NULL, &sobe);
-    // insere23(&Raiz, 1500,NULL, &sobe);
-    // insere23(&Raiz, 1200,NULL, &sobe);
-    // insere23(&Raiz, 800, NULL, &sobe);
-    // insere23(&Raiz, 1100,NULL, &sobe);
-    // insere23(&Raiz, 1700,NULL, &sobe);
-    // insere23(&Raiz, 350, NULL, &sobe);
-    // insere23(&Raiz, 450, NULL, &sobe);
-    // insere23(&Raiz, 150, NULL, &sobe);
-    // insere23(&Raiz, 50, NULL,  &sobe);
-    // insere23(&Raiz, 470, NULL, &sobe);
-    // insere23(&Raiz, 490, NULL, &sobe);
+        switch (op){
+            case 1:
+                mostrar(raiz, 0);
+                break;
+            case 2:
+                printf("Deseja buscar um calcado na arvore? 1 - sim / 0 - nao: ");
+                scanf(" %d", &sinalization);
 
-    // mostrar(raiz, 0);
+                if(sinalization == 1){
+                        
+                    if(raiz != NULL){
+                        printf("Digite o codigo do calcado: ");
+                        scanf("%d", &cod);
 
+                        aux = buscarProduto(raiz, cod);
+
+                        if(aux != NULL){
+                            printf("calcado encontrada\n");
+                            exibirInfo(aux);
+                        }else
+                            printf("calcado nao encontrada\n");
+                }else{
+                    printf("Arvore vazia\n");
+                }
+                break;
+            case 3:
+                printf("Deseja comprar um calcado? 1 - sim / 0 - nao: ");
+                scanf(" %d", &sinalization);
+
+                if(sinalization == 1){
+                    if(raiz != NULL){
+                        
+                        mostrar(raiz, 0);
+
+                        printf("Digite o codigo do calcado: ");
+                        scanf("%d", &cod);
+                        printf("Digite a quantidade de calcados: ");
+                        scanf("%d", &qtd);
+
+                        vender(raiz, qtd, cod, resultado);
+                        printf("%s", resultado);
+                    }else{
+                        printf("Arvore vazia\n");
+                    }
+                }
+                break;
+            case 4:
+                printf("Deseja adicionar um calcado? 1 - sim / 0 - nao: ");
+                scanf(" %d", &sinalization);
+
+                if(sinalization == 1){
+                    if(raiz != NULL){
+                        printf("Digite o codigo do produto: ");
+                        scanf("%d", &cod);
+                        printf("Digite o tamanho do produto: ");
+                        scanf("%d", &tam);
+                        printf("Digite a quantida do produto: ");
+                        scanf("%d", &qtd);
+                        printf("Digite o tipo do produto: ");
+                        scanf("%s", tipo);
+                        printf("Digite o a marca do produto: ");
+                        scanf("%s", marca);
+                        printf("Digite o preco do produto: ");
+                        scanf("%f", &preco);
+
+                        adicionarCalcados(&raiz, &sobe, cod, tam, qtd, tipo, marca, preco, resultado);
+                        printf("%s", resultado);
+                    }else{
+                        printf("Arvore vazia\n");
+                    }
+                }
+                break;
+            }
+        }
+    }
     return 0;    
 }

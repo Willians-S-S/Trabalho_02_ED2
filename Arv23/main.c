@@ -1,7 +1,30 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include "arv23.h"
+
+Info *buscaPalavra1(Arv23 *raiz, char *palavra, Info **aux, int *nos){
+
+    if(raiz != NULL){
+        *nos += 1;
+        if(strcmp(palavra, raiz->info1->palavra) == 0)
+            *aux = raiz->info1;
+        if(raiz->numInfo == 2){
+            if(strcmp(palavra, raiz->info2->palavra) == 0)
+                *aux = raiz->info2;
+        }
+        
+        if(strcmp(palavra, raiz->info1->palavra) < 0)   
+            buscaPalavra(raiz->esq, palavra, aux);
+        
+        else if((raiz->numInfo == 1) || (raiz->numInfo == 2 && strcmp(palavra, raiz->info2->palavra) < 0))
+            buscaPalavra(raiz->centro, palavra, aux);
+
+        else
+            buscaPalavra(raiz->dir, palavra, aux);
+    }
+}
 
 int main(){
     Arv23 *raiz;
@@ -11,9 +34,37 @@ int main(){
     aux = NULL;
     
     char path[200], palavra[50], nomeArquivo[50], resultado[100];
-    int inseriu[4] = {0}, op = -1, linha = 0, sinalization = -1;
+    int inseriu[4] = {0}, op = -1, linha = 0, sinalization = -1, nos = 0;
 
+    // lerArquivo("arquivo.txt", &raiz, resultado);
     lerArquivo("arquivo.txt", &raiz, resultado);
+    imprimirArv(raiz);
+
+    clock_t inicio, fim;
+
+// Variáveil para armazenar o tempo
+
+    double tempo = 0.0;
+
+// clock() é uma função que marca um momento da medição
+    for(int i = 0; i < 30; i++){
+        inicio = clock();
+        buscaPalavra(raiz, "texto", &aux);
+        // buscaPalavra1(raiz, "texto", &aux, &nos);
+        fim = clock();    
+        tempo += (double)(fim - inicio) / CLOCKS_PER_SEC * 1000;
+    }
+
+    if(aux != NULL){
+        printf("\n");
+        imprimirInfo(aux);
+    }else
+        printf("\nPalavra não encontrada\n");
+
+    // tempo = (double)(fim - inicio) / CLOCKS_PER_SEC * 1000;
+    tempo = tempo / 30;
+    printf("%f\n", tempo);
+    printf("%d\n", nos);
 
     while (op != 0) {
         printf("\n");
@@ -103,7 +154,6 @@ int main(){
                     printf("Digite a linha: ");
                     scanf(" %d", &linha);
                     auxRemover(&raiz, palavra, linha, resultado);
-                    // remover23(NULL, &raiz, palavra, resultado);
                     printf("%s", resultado);
                 }else{
                     printf("Arvore vazia\n");

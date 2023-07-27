@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include "rubroNegro.h"
 #include "imprimir.h"
 
@@ -124,19 +125,61 @@ void imprimirPalavra(Rubro *raiz, char palavra[], int inseriu[]){
     }
 }
 
+void imprimirAvr1(Rubro *raiz){
+    if(raiz != NULL){
+        imprimeNo(raiz);
+        imprimirAvr(raiz->dir);
+    }
+}
+
 int main(){
     Rubro *raiz;
     raiz = NULL;
     char path[200], palavra[50];
-    int inseriu[4] = {0}, op = -1, linha = 0;
-    // inserirRubro(&raiz, "opa", 1, inseriu);
-    // inserirRubro(&raiz, "opa", 2, inseriu);
-    // inserirRubro(&raiz, "amanha", 1, inseriu);
-    // inserirRubro(&raiz, "lavamonos", 1, inseriu);
+    int inseriu[4] = {0}, op = -1, linha = 0, nos = 0, cont = 0;
+    Rubro *aux ;
 
-// O programa deve permitir o usuário
-// buscar uma palavra e o programa deve responder em quais linhas do texto ela foi utilizada. Além disso, ele
-// deve permitir excluir uma palavra de uma linha bem como acrescentar.
+    lerArquivo("arquivo.txt", &raiz, inseriu);
+     imprimirAvr(raiz);
+    aux = raiz;
+    // imprimirAvr1(raiz);
+
+    while (aux != NULL)
+    {
+        cont += 1;
+        aux = aux->dir;
+    }
+    
+
+    clock_t inicio, fim;
+
+// Variáveil para armazenar o tempo
+
+    double tempo = 0;
+
+// clock() é uma função que marca um momento da medição
+
+//     inicio = clock();
+
+// // tudo que será medido deve ficar entre as variáveis inicio e fim
+//     aux = buscarPalavra1(raiz, "Santos", inseriu);
+
+//     fim = clock();    
+
+    for(int i = 0; i < 30; i++){
+        inicio = clock();
+        aux = buscarPalavra1(raiz, "texto", inseriu);
+        // buscaPalavra1(raiz, "texto", &aux, &nos);
+        fim = clock();    
+        tempo += (double)(fim - inicio) / CLOCKS_PER_SEC * 1000;
+    }
+
+    // imprimeNo(aux);
+
+    // tempo = (double)(fim - inicio) / CLOCKS_PER_SEC * 1000;
+    tempo = tempo / 30;
+    printf("%f\n", tempo);
+    printf("%d\n", cont);
 
     while (op != 0) {
         printf("\n1 - Ler Arquivo\n2 - Inserir Palavra\n3 - Imprimir Arvore\n4 - Imprimir um No\n5 - Excluir Palavra\nDigite a opcao: ");

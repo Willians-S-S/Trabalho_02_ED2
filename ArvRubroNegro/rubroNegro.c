@@ -187,6 +187,23 @@ Rubro *buscarPalavra(Rubro *raiz, char *palavra, int linha, int achou[]){
     return aux;
 }
 
+Rubro *buscarPalavra1(Rubro *raiz, char *palavra, int achou[]){
+    Rubro *aux;
+    aux = NULL;
+    if(raiz){
+        int igualMenorMaior;
+        igualMenorMaior = strcmp(palavra, raiz->info->palavra);
+
+        if(igualMenorMaior == 0){
+            aux = raiz;
+        }else if(igualMenorMaior < 0)
+           aux = buscarPalavra1(raiz->esq, palavra, achou);
+        else
+           aux = buscarPalavra1(raiz->dir, palavra, achou);
+    }
+    return aux;
+}
+
 int removeLinha(Linhas **no, int linha, int achou[]){
     int flag;
     flag = 0;

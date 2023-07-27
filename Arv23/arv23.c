@@ -290,6 +290,7 @@ void imprimirArv(Arv23 *raiz){
 Info *buscaPalavra(Arv23 *raiz, char *palavra, Info **aux){
 
     if(raiz != NULL){
+        
         if(strcmp(palavra, raiz->info1->palavra) == 0)
             *aux = raiz->info1;
         if(raiz->numInfo == 2){
