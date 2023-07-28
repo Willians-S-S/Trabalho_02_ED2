@@ -21,8 +21,8 @@ void imprimeNo(Rubro *no){
 
 void imprimirAvr(Rubro *raiz){
     if(raiz){
-        imprimeNo(raiz);
         imprimirAvr(raiz->esq);
+        imprimeNo(raiz);
         imprimirAvr(raiz->dir);
     }
 }

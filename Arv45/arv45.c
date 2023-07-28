@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 typedef struct Info Info;
 // s  informações  de  cada  calçado  são:  código, tipo,   marca,   tamanho,   quantidade   e   preço.
@@ -29,7 +30,7 @@ void lerArquivo(Arv45 **raiz, Info **sobe){
     float preco;
 
     // Abrir o arquivo para leitura
-    arquivo = fopen("loja.txt", "r");
+    arquivo = fopen("teste.txt", "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
     }else{
@@ -444,7 +445,7 @@ Info *buscarProduto(Arv45 *raiz, int cod){
     return achou;
 }
 
-void atualizarArquivo(Info *no){
+void atualizarArquivo(Info *no, char *resultado){
     char nomeArquivo[] = "loja.txt";
     FILE *arquivo;
     int linhaAtual = 1;
@@ -453,13 +454,13 @@ void atualizarArquivo(Info *no){
     arquivo = fopen(nomeArquivo, "r+");
 
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
+        strcpy(resultado, "Erro ao abrir o arquivo.\n");
     }else{
         int flag = 1;
         // Percorre o arquivo até a linha desejada
         while (linhaAtual < no->linha) {
             if (fgets(linha, sizeof(linha), arquivo) == NULL) {
-                printf("Linha alvo fora do alcance do arquivo.\n");
+                strcpy(resultado, "Linha alvo fora do alcance do arquivo.\n");
                 fclose(arquivo);
                 flag = 0;
             }
@@ -470,7 +471,7 @@ void atualizarArquivo(Info *no){
             fseek(arquivo, -1, SEEK_CUR); // Volta 1 caractere para sobrescrever a quebra de linha
             // codigo, tamanho, quantidade, tipo, marca, preco.
             fprintf(arquivo, "\n%d %d %d %s %s %.2f", no->cod, no->tam, no->qtd, no->tipo, no->marca, no->preco);
-            printf("Arquivo atualizado\n");
+            strcpy(resultado ,"Arquivo atualizado\n");
 
             fclose(arquivo);
         }
@@ -486,7 +487,6 @@ void vender(Arv45 *raiz, int qtd, int cod, char *resultado){
 
         if(qtd > aux->qtd){
             char str_numero[100];
-            // str_numero = itoa(aux->qtd);
             snprintf(str_numero, sizeof(str_numero), "%d", aux->qtd);
 
             strcpy(resultado, "Nao eh possivel comprar pois nao temos essa quantidade de produto. Estao disponiveis somente ");
@@ -496,13 +496,23 @@ void vender(Arv45 *raiz, int qtd, int cod, char *resultado){
 
         else if(qtd > aux->qtd && aux->qtd != 0){
             aux->qtd = 0;
-            atualizarArquivo(aux);
-            strcpy(resultado, "Compra realizada com sucesso.\n");
+            atualizarArquivo(aux, resultado);
+
+            if(strcmp(resultado, "Arquivo atualizado\n") == 0){
+                strcpy(resultado, "Compra realizada com sucesso.\n");
+            }else if(strcmp(resultado, "Linha alvo fora do alcance do arquivo.\n") == 0){
+                strcpy(resultado, "Nao foi possivel efetuar a compra.\n");
+            }
         }
         else if(qtd != 0 && aux->qtd != 0){
                 aux->qtd -= qtd;
-                atualizarArquivo(aux);
-                strcpy(resultado, "Compra realizada com sucesso.\n");
+                atualizarArquivo(aux, resultado);
+
+                if(strcmp(resultado, "Arquivo atualizado\n") == 0){
+                    strcpy(resultado, "Compra realizada com sucesso.\n");
+                }else if(strcmp(resultado, "Linha alvo fora do alcance do arquivo.\n") == 0){
+                    strcpy(resultado, "Nao foi possivel efetuar a compra.\n");
+                }
         }
         else{
             if(qtd == 0)
@@ -514,29 +524,28 @@ void vender(Arv45 *raiz, int qtd, int cod, char *resultado){
         strcpy(resultado, "Produto nao encontrado.\n");
 }
 
-void reporProduto(Arv45 *raiz){
-    mostrar(raiz, 0);
-    int cod, qtd, opcompra;
+void reporProduto(Arv45 *raiz, int cod, int qtd, char *resultado){
+    
     Info *aux;
-
-    printf("Escolha o produto pelo código: ");
-    scanf("%d", &cod);
-    // digitou o codigo certo?
 
     aux = buscarProduto(raiz, cod);
 
     if(aux != NULL){
-        printf("Qual a quantidade de produto: ");
-        scanf("%d", &qtd);
 
         if(qtd > 0){
-           aux->qtd += qtd;
-            atualizarArquivo(aux);
+            aux->qtd += qtd;
+            atualizarArquivo(aux, resultado);
+
+            if(strcmp(resultado, "Arquivo atualizado\n") == 0){
+                    strcpy(resultado, "Produto reposto com sucesso.\n");
+            }else if(strcmp(resultado, "Linha alvo fora do alcance do arquivo.\n") == 0){
+                strcpy(resultado, "Nao foi possivel repor o produto.\n");
+            }
         }else
-            printf("Quantidade de produto inferior ou igual a zero.\n");
+            strcpy(resultado, "Quantidade de produto inferior ou igual a zero.\n");
         
     }else
-        printf("Produto nao encontrado.\n");
+        strcpy(resultado ,"Produto nao encontrado.\n");
 }
 
 int quantidadeLinhas(){
@@ -579,15 +588,97 @@ void adicionarCalcados(Arv45 **raiz, Info **sobe, int cod, int tam, int qtd, cha
 
 }
 
+void criarArquivo(){
+    FILE *arquivo;
+
+    arquivo = fopen("teste.txt", "w");
+
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+    }else{
+        int flag = 0, qtdLinha = 1;
+        for(int i = 1; i <= 5100; i++)
+            fprintf(arquivo, "%d 38 1 sapato nike 100.00\n", i);
+        fclose(arquivo);
+    }
+}
+
+Info *buscarProduto1(Arv45 *raiz, int cod, int *cont){
+    Info *achou = NULL;
+
+    if(raiz){
+        *cont += 1;
+        if(cod == raiz->info1->cod)
+            achou = raiz->info1;
+
+        if(raiz->qtdInfo == 2){
+            if(cod == raiz->info2->cod)
+                achou = raiz->info2;
+
+        } 
+        if(raiz->qtdInfo == 3){
+            if(cod == raiz->info3->cod)
+                achou = raiz->info3;
+
+        }
+        if(raiz->qtdInfo == 4){
+            if(cod == raiz->info4->cod)
+                achou = raiz->info4;
+
+        }
+        if(achou == NULL){
+            if(cod < raiz->info1->cod)
+                achou = buscarProduto1(raiz->esq, cod, cont);
+
+            else if(raiz->qtdInfo == 1 || (raiz->qtdInfo <= 4 && cod < raiz->info2->cod))
+                achou = buscarProduto1(raiz->centro_esq, cod, cont);
+
+            else if((raiz->qtdInfo == 2)  || (raiz->qtdInfo <= 4 && cod < raiz->info3->cod))
+                achou = buscarProduto1(raiz->centro, cod, cont);
+
+            else if((raiz->qtdInfo == 3) || (raiz->qtdInfo == 4 && cod < raiz->info4->cod))
+                achou = buscarProduto1(raiz->centro_dir, cod, cont);
+
+            else 
+                achou = buscarProduto1(raiz->dir, cod, cont);
+        }
+    }
+    return achou;
+}
+
+
 int main(){
     Arv45 *raiz = NULL;
     Info *sobe, *aux; 
     aux = NULL;
     char resultado[100], tipo[100], marca[100];
-    int op = -1, cod, qtd, opcompra, sinalization, tam;
+    int op = -1, cod, qtd, opcompra, sinalization, tam, cont = 0;
     float preco;
 
+    clock_t inicio, fim;
+
+
+    double tempo = 0;
+    criarArquivo();
     lerArquivo(&raiz, &sobe);
+
+
+    for(int i = 1; i <= 30; i++){
+        inicio = clock();
+        aux = buscarProduto1(raiz, i*170, &cont);
+        fim = clock();    
+        tempo = (double)(fim - inicio) / CLOCKS_PER_SEC * 1000;
+
+        exibirInfo(aux);
+        printf("%f e %d caminho\n", tempo, cont);
+        cont = 0;
+    }
+
+    // imprimeNo(aux);
+
+    // tempo = (double)(fim - inicio) / CLOCKS_PER_SEC * 1000;
+    // tempo = tempo / 30;
+
 
     while (op != 0) {
         printf("\n0 - Encerrar\n"
@@ -595,6 +686,7 @@ int main(){
                "2 - Buscar calcado\n"
                "3 - Comprar calcado\n"
                "4 - Adicionar calcado\n"
+               "5 - Repor calcado\n"
                "Digite a opcao: ");
         scanf("%d", &op);
 
@@ -670,6 +762,24 @@ int main(){
                     }
                 }
                 break;
+            case 5:
+                printf("Deseja adicionar um calcado? 1 - sim / 0 - nao: ");
+                scanf(" %d", &sinalization);
+
+                if(sinalization == 1){
+                    if(raiz != NULL){
+                        mostrar(raiz, 0);
+                        printf("Digite o codigo do produto: ");
+                        scanf("%d", &cod);
+                        printf("Digite a quantida do produto: ");
+                        scanf("%d", &qtd);
+
+                        reporProduto(raiz, cod, qtd, resultado);
+                        printf("%s", resultado);
+                    }else{
+                        printf("Arvore vazia\n");
+                    }
+                }
             }
         }
     }
